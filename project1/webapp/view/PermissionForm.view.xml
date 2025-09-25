@@ -1,0 +1,31 @@
+<mvc:View controllerName="project1.controller.PermissionForm"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="permissionFormPage" title="Berechtigungsformular" showNavButton="true" navButtonPress="onNavBack">
+        <content>
+            <Wizard id="permissionWizard" enableScrolling="false">
+                <WizardStep id="stepUserInformation" title="Benutzerinformationen">
+                    <VBox>
+                        <Text text="Benutzer: {userModel>/name}" />
+                        <CheckBox text="Antrag für eine andere Person" select="onApplyForAnotherPersonSelect" />
+                        <VBox id="additionalUserInfo" visible="false">
+                            <Label text="Name" />
+                            <Input placeholder="Name eingeben" />
+                            <Label text="Sachgebiet" />
+                            <Input placeholder="Sachgebiet eingeben" />
+                            <Label text="Vnummer" />
+                            <Input placeholder="Vnummer eingeben" />
+                        </VBox>
+                    </VBox>
+                </WizardStep>
+                <WizardStep id="stepSelectPermissions" title="Berechtigungen auswählen">
+                    <VBox>
+                        <CheckBox text="Personal" select="onPermissionChange" />
+                        <CheckBox text="Logistik" select="onPermissionChange" />
+                        <CheckBox text="Finanzen" select="onPermissionChange" />
+                    </VBox>
+                </WizardStep>
+            </Wizard>
+        </content>
+    </Page>
+</mvc:View>
