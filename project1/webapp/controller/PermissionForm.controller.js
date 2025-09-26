@@ -34,21 +34,27 @@ sap.ui.define([
             const bSelected = oEvent.getSource().getSelected();
             const sText = oEvent.getSource().getText();
             const aSteps = this._wizard.getSteps();
-            const oExistingStep = aSteps.find(step => step.getTitle() === sText + " Details");
+            let oExistingStep = aSteps.find(step => step.getTitle() === sText + " Details");
 
             if (bSelected && !oExistingStep) {
+                console.log(`Adding step for: ${sText}`);
                 const oNewStep = new WizardStep({
                     title: sText + " Details",
                     content: new VBox({
                         items: [
                             new Text({ text: "Details for " + sText })
                         ]
-                    })
+                    }),
+                    visible: true
                 });
                 this._wizard.addStep(oNewStep);
             } else if (!bSelected && oExistingStep) {
-                this._wizard.removeStep(oExistingStep);
+                console.log(`Hiding step for: ${sText}`);
+                oExistingStep.setVisible(false);
             }
+
+            // Update the wizard's progress indicator
+            this._updateWizardProgress();
         },
 
         onApplyForAnotherPersonSelect: function (oEvent) {
@@ -65,30 +71,48 @@ sap.ui.define([
         },
 
         _recalculateSteps: function () {
-            // Remove all dynamically added steps
+            // Hide all dynamically added steps
             const aSteps = this._wizard.getSteps();
             aSteps.forEach(step => {
                 if (step !== this._stepUserInformation && step !== this._stepSelectPermissions) {
-                    this._wizard.removeStep(step);
+                    console.log(`Hiding step during recalculation: ${step.getTitle()}`);
+                    step.setVisible(false);
                 }
             });
 
-            // Re-add steps based on current selections
+            // Re-show steps based on current selections
             const aCheckBoxes = this._stepSelectPermissions.getContent()[0].getItems();
             aCheckBoxes.forEach(checkBox => {
                 if (checkBox.getSelected()) {
                     const sText = checkBox.getText();
-                    const oNewStep = new WizardStep({
-                        title: sText + " Details",
-                        content: new VBox({
-                            items: [
-                                new Text({ text: "Details for " + sText })
-                            ]
-                        })
-                    });
-                    this._wizard.addStep(oNewStep);
+                    let oStep = aSteps.find(step => step.getTitle() === sText + " Details");
+                    if (oStep) {
+                        console.log(`Re-showing step for: ${sText}`);
+                        oStep.setVisible(true);
+                    } else {
+                        console.log(`Adding step for: ${sText}`);
+                        const oNewStep = new WizardStep({
+                            title: sText + " Details",
+                            content: new VBox({
+                                items: [
+                                    new Text({ text: "Details for " + sText })
+                                ]
+                            }),
+                            visible: true
+                        });
+                        this._wizard.addStep(oNewStep);
+                    }
                 }
             });
+
+            // Update the wizard's progress indicator
+            this._updateWizardProgress();
+        },
+
+        _updateWizardProgress: function () {
+            const aSteps = this._wizard.getSteps();
+            const aVisibleSteps = aSteps.filter(step => step.getVisible());
+            this._wizard.invalidateStep(aVisibleSteps[0]); // Refresh the wizard to update the progress indicator
         }
     });
 });
