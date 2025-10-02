@@ -1,20 +1,42 @@
 <mvc:View controllerName="project1.controller.PermissionForm"
     xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m">
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
     <Page id="permissionFormPage" title="Berechtigungsformular" showNavButton="true" navButtonPress="onNavBack">
         <content>
             <Wizard id="permissionWizard" enableScrolling="false">
+                <WizardStep id="stepApplicationType" title="Antragsart definieren">
+                    <VBox>
+                        <Label text="Antragsart" />
+                        <ComboBox id="applicationTypeComboBox" selectionChange="onApplicationTypeChange">
+                            <items>
+                                <core:Item key="erstzulassung" text="Erstzulassung" />
+                                <core:Item key="reaktivieren" text="Reaktivieren" />
+                                <core:Item key="erweitern" text="Erweitern" />
+                                <core:Item key="beenden" text="Beenden" />
+                            </items>
+                        </ComboBox>
+                        <VBox id="dateInputs" visible="false">
+                            <Label text="Ab Datum" />
+                            <DatePicker id="startDatePicker" />
+                            <Label text="Bis Datum" visible="false" />
+                            <DatePicker id="endDatePicker" visible="false" />
+                        </VBox>
+                    </VBox>
+                </WizardStep>
                 <WizardStep id="stepUserInformation" title="Benutzerinformationen">
                     <VBox>
                         <Text text="Benutzer: {userModel>/name}" />
-                        <CheckBox text="Antrag für eine andere Person" select="onApplyForAnotherPersonSelect" />
+                        <CheckBox id="applyForAnotherPersonCheckBox" text="Antrag für eine andere Person" select="onApplyForAnotherPersonSelect" visible="false" />
                         <VBox id="additionalUserInfo" visible="false">
-                            <Label text="Name" />
-                            <Input placeholder="Name eingeben" />
-                            <Label text="Sachgebiet" />
-                            <Input placeholder="Sachgebiet eingeben" />
-                            <Label text="Vnummer" />
-                            <Input placeholder="Vnummer eingeben" />
+                            <Label text="Dienststelle, Rufname" />
+                            <Input placeholder="Dienststelle, Rufname eingeben" />
+                            <Label text="V-Nummer" />
+                            <Input placeholder="V-Nummer eingeben" />
+                            <Label text="Orgeinheit (SG) bzw. vdl dst" />
+                            <Input placeholder="Orgeinheit (SG) bzw. vdl dst eingeben" />
+                            <Label text="Dienstort" />
+                            <Input placeholder="Dienstort eingeben" />
                         </VBox>
                     </VBox>
                 </WizardStep>

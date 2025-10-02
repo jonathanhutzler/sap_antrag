@@ -5,8 +5,13 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/m/WizardStep",
     "sap/m/VBox",
-    "sap/m/Text"
-], function (UIComponent, History, Controller, MessageBox, WizardStep, VBox, Text) {
+    "sap/m/Text",
+    "sap/ui/core/Item",
+    "sap/m/DatePicker",
+    "sap/m/CheckBox",
+    "sap/m/Label",
+    "sap/m/Input"
+], function (UIComponent, History, Controller, MessageBox, WizardStep, VBox, Text, Item, DatePicker, CheckBox, Label, Input) {
     "use strict";
 
     return Controller.extend("project1.controller.PermissionForm", {
@@ -15,6 +20,10 @@ sap.ui.define([
             this._stepUserInformation = this.byId("stepUserInformation");
             this._stepSelectPermissions = this.byId("stepSelectPermissions");
             this._additionalUserInfo = this.byId("additionalUserInfo");
+            this._dateInputs = this.byId("dateInputs");
+            this._startDatePicker = this.byId("startDatePicker");
+            this._endDatePicker = this.byId("endDatePicker");
+            this._applyForAnotherPersonCheckBox = this.byId("applyForAnotherPersonCheckBox");
 
             // Attach event handler for step activation
             this._wizard.attachStepActivate(this.onStepActivate.bind(this));
@@ -59,7 +68,16 @@ sap.ui.define([
 
         onApplyForAnotherPersonSelect: function (oEvent) {
             const bSelected = oEvent.getSource().getSelected();
-            this._additionalUserInfo.setVisible(bSelected);
+
+            const aLabels = this._additionalUserInfo.getItems().filter(item => item instanceof Label);
+            aLabels.forEach(label => {
+                const sText = label.getText();
+                if (bSelected) {
+                    label.setText(sText + " (der anderen Person)");
+                } else {
+                    label.setText(sText.replace(" (der anderen Person)", ""));
+                }
+            });
         },
 
         onStepActivate: function (oEvent) {
@@ -68,6 +86,26 @@ sap.ui.define([
                 // Recalculate steps when entering the "Select Permissions" step
                 this._recalculateSteps();
             }
+        },
+
+        onApplicationTypeChange: function (oEvent) {
+            const sSelectedKey = oEvent.getSource().getSelectedKey();
+            const bShowDateFields = sSelectedKey !== "";
+            const bShowEndDate = sSelectedKey !== "beenden";
+
+            // Show or hide the date fields based on the selection
+            this._dateInputs.setVisible(bShowDateFields);
+            this._startDatePicker.setVisible(bShowDateFields);
+            this._endDatePicker.setVisible(bShowDateFields && bShowEndDate);
+            this.byId("dateInputs").getItems()[0].setVisible(bShowDateFields); // Label for "Ab Datum"
+            this.byId("dateInputs").getItems()[2].setVisible(bShowDateFields && bShowEndDate); // Label for "Bis Datum"
+
+            // Show the "Apply for another person" checkbox only for "Erstzulassung"
+            const bShowApplyForAnotherPerson = sSelectedKey === "erstzulassung";
+            this._applyForAnotherPersonCheckBox.setVisible(bShowApplyForAnotherPerson);
+
+            // Always show the additional user information
+            this._additionalUserInfo.setVisible(true);
         },
 
         _recalculateSteps: function () {
