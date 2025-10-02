@@ -6,7 +6,7 @@
         <content>
             <Wizard id="permissionWizard" enableScrolling="false">
                 <WizardStep id="stepApplicationType" title="Antragsart definieren">
-                    <VBox>
+                    <VBox width="400px" class="sapUiSmallMargin">
                         <Label text="Antragsart" />
                         <ComboBox id="applicationTypeComboBox" selectionChange="onApplicationTypeChange">
                             <items>
@@ -25,7 +25,7 @@
                     </VBox>
                 </WizardStep>
                 <WizardStep id="stepUserInformation" title="Benutzerinformationen">
-                    <VBox>
+                    <VBox width="400px" class="sapUiSmallMargin">
                         <Text text="Benutzer: {userModel>/name}" />
                         <CheckBox id="applyForAnotherPersonCheckBox" text="Antrag für eine andere Person" select="onApplyForAnotherPersonSelect" visible="false" />
                         <VBox id="additionalUserInfo" visible="false">
@@ -45,6 +45,8 @@
                         <CheckBox text="Personal" select="onPermissionChange" />
                         <CheckBox text="Logistik" select="onPermissionChange" />
                         <CheckBox text="Finanzen" select="onPermissionChange" />
+                        <CheckBox text="Vorzimmer/Direktoratsassistenz" select="onPermissionChange" />
+                        <CheckBox text="FIS (FührungsInformationSystem)" select="onPermissionChange" />
                     </VBox>
                 </WizardStep>
             </Wizard>

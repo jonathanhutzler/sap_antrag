@@ -10,8 +10,9 @@ sap.ui.define([
     "sap/m/DatePicker",
     "sap/m/CheckBox",
     "sap/m/Label",
-    "sap/m/Input"
-], function (UIComponent, History, Controller, MessageBox, WizardStep, VBox, Text, Item, DatePicker, CheckBox, Label, Input) {
+    "sap/m/Input",
+    "sap/m/TextArea"
+], function (UIComponent, History, Controller, MessageBox, WizardStep, VBox, Text, Item, DatePicker, CheckBox, Label, Input, TextArea) {
     "use strict";
 
     return Controller.extend("project1.controller.PermissionForm", {
@@ -47,13 +48,42 @@ sap.ui.define([
 
             if (bSelected && !oExistingStep) {
                 console.log(`Adding step for: ${sText}`);
-                const oNewStep = new WizardStep({
-                    title: sText + " Details",
-                    content: new VBox({
+                let oNewStepContent;
+                if (sText === "Personal") {
+                    oNewStepContent = new VBox({
+                        items: [
+                            new CheckBox({ text: "Personaleinsatz/-Entwicklung" }),
+                            new CheckBox({ text: "Personalgewinnung" }),
+                            new CheckBox({ text: "Personaldienst" }),
+                            new CheckBox({ text: "Lehrgangsmanagement" }),
+                            new CheckBox({ text: "Org.-Management" }),
+                            new CheckBox({ text: "Personalhaushalt" }),
+                            new CheckBox({ text: "Dozent" }),
+                            new CheckBox({ text: "Bewerbersichtung" }),
+                            new CheckBox({ text: "Krisenbeaftragte/r (für Stäbe)" }),
+                            new CheckBox({
+                                text: "Sonstiges/Konkretsierung",
+                                select: this.onSonstigesSelect.bind(this)
+                            }),
+                            new TextArea({
+                                placeholder: "Bitte konkretisieren...",
+                                visible: false,
+                                rows: 3,
+                                id: this.createId("sonstigesInput")
+                            })
+                        ]
+                    });
+                } else {
+                    oNewStepContent = new VBox({
                         items: [
                             new Text({ text: "Details for " + sText })
                         ]
-                    }),
+                    });
+                }
+
+                const oNewStep = new WizardStep({
+                    title: sText + " Details",
+                    content: oNewStepContent,
                     visible: true
                 });
                 this._wizard.addStep(oNewStep);
@@ -64,6 +94,14 @@ sap.ui.define([
 
             // Update the wizard's progress indicator
             this._updateWizardProgress();
+        },
+
+        onSonstigesSelect: function (oEvent) {
+            const bSelected = oEvent.getSource().getSelected();
+            const oInput = sap.ui.getCore().byId(this.createId("sonstigesInput"));
+            if (oInput) {
+                oInput.setVisible(bSelected);
+            }
         },
 
         onApplyForAnotherPersonSelect: function (oEvent) {
