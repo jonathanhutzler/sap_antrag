@@ -245,7 +245,10 @@ export const handwerkerrechnung: NicheConfig = {
     professionalAdviceNote:
       'Ob sich aus einer Feststellung ein Anspruch ergibt, hängt vom Vertrag und vom Einzelfall ab. Diese Frage beantworten eine Rechtsanwältin oder ein Rechtsanwalt, in steuerlichen Fragen eine Steuerberaterin oder ein Steuerberater, bei technischen Fragen eine öffentlich bestellte Sachverständige oder ein Sachverständiger.',
     imprintEntity: '',
-    dataRetentionHours: 72,
+    // 14 Tage — wie im Bestandsprodukt zugesagt („automatische Löschung nach
+    // 14 Tagen"). Die Zahl wird direkt als TTL im Speicher gesetzt und
+    // erscheint so auch in der Datenschutzerklärung.
+    dataRetentionHours: 336,
     serviceDescription:
       'Prüfung einer Handwerkerrechnung gegen den veröffentlichten Prüfkatalog Handwerkerrechnung und Ausgabe eines PDF-Berichts',
   },
@@ -259,7 +262,7 @@ export const handwerkerrechnung: NicheConfig = {
       'Jede Feststellung nennt ihre Grundlage: Paragraf oder benanntes Referenzband.',
       'Jede Feststellung endet mit einem Satz, den Sie wörtlich schreiben oder sagen können.',
       'Die Vorschau ist kostenlos. Bezahlt wird erst, wenn etwas gefunden wurde.',
-      'Ihr Dokument wird nach 72 Stunden automatisch gelöscht.',
+      'Ihr Dokument wird nach 14 Tagen automatisch gelöscht.',
     ],
     competitorAnchor:
       'Ein Erstberatungsgespräch bei einer Rechtsanwältin oder einem Rechtsanwalt kostet nach § 34 RVG bis zu 190 Euro zuzüglich Umsatzsteuer. Diese Prüfung ersetzt das nicht — sie sagt Ihnen, ob sich der Weg dorthin lohnt.',
@@ -313,7 +316,7 @@ export const handwerkerrechnung: NicheConfig = {
       },
       {
         q: 'Was passiert mit meiner Rechnung?',
-        a: 'Die Datei wird zur Analyse an Anthropic übermittelt und dort nicht zum Training verwendet. Ergebnis und Dokumentbezug werden 72 Stunden zwischengespeichert und danach automatisch gelöscht. Details in der Datenschutzerklärung.',
+        a: 'Die Datei wird zur Analyse an Anthropic übermittelt und dort nicht zum Training verwendet. Ergebnis und Dokumentbezug werden 14 Tage zwischengespeichert und danach automatisch gelöscht. Details in der Datenschutzerklärung.',
       },
       {
         q: 'Was ist, wenn nichts gefunden wird?',

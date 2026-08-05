@@ -23,29 +23,38 @@ export const site = {
   promise:
     'Wir prüfen Abrechnungen gegen einen veröffentlichten Prüfkatalog — nicht gegen ein Bauchgefühl. Sie sehen vorab, wonach gesucht wird, und danach, was gefunden wurde.',
 
+  /**
+   * Übernommen aus dem Impressum des Bestandsprodukts
+   * handwerkerrechnung-pruefen.de (Stand 08/2026).
+   */
   provider: {
-    entity: '[Name des Anbieters eintragen]',
-    street: '[Straße und Hausnummer eintragen]',
-    zipCity: '[PLZ und Ort eintragen]',
+    entity: 'Jonathan Hutzler',
+    street: 'Feldstraße 106',
+    zipCity: '85716 Unterschleißheim',
     country: 'Deutschland',
-    email: '[E-Mail-Adresse eintragen]',
+    email: 'kontakt@handwerkerrechnung-pruefen.de',
+    /**
+     * Leer zulässig, solange eine zweite schnelle Kontaktmöglichkeit besteht
+     * (Kontaktformular mit Antwort binnen 60 Minuten). Sonst hier eintragen.
+     */
     phone: '',
     /** Kleinunternehmer nach § 19 UStG: kein Umsatzsteuerausweis. */
     smallBusiness: true,
     vatNote:
-      'Gemäß § 19 UStG wird keine Umsatzsteuer berechnet und daher auch nicht ausgewiesen.',
+      'Als Kleinunternehmer im Sinne von § 19 UStG wird keine Umsatzsteuer berechnet und daher auch keine Umsatzsteuer-Identifikationsnummer geführt.',
     /** Nur ausfüllen, wenn vorhanden — sonst leer lassen. */
     vatId: '',
     /** § 18 Abs. 2 MStV — Verantwortlicher für redaktionelle Inhalte. */
-    editorialResponsible: '[Name des Anbieters eintragen]',
+    editorialResponsible: 'Jonathan Hutzler',
     registerNote: '',
   },
 
   support: {
     /** Eine Support-Inbox für alle Nischen. */
-    inbox: process.env.SUPPORT_INBOX || '[E-Mail-Adresse eintragen]',
+    inbox: process.env.SUPPORT_INBOX || 'kontakt@handwerkerrechnung-pruefen.de',
     /** Absender für Resend. Muss eine verifizierte Domain sein. */
-    mailFrom: process.env.MAIL_FROM || 'Pruefstelle <noreply@[DACHDOMAIN.de eintragen]>',
+    mailFrom:
+      process.env.MAIL_FROM || 'Handwerkerrechnung pruefen <noreply@handwerkerrechnung-pruefen.de>',
   },
 
   /** EU-Plattform zur Online-Streitbeilegung, Pflichtangabe für Onlinehändler. */
