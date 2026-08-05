@@ -8,6 +8,31 @@ Analytics-Konto, eine Support-Inbox.
 
 ---
 
+## Stand: noch nicht produktiv
+
+Die Engine ist vollständig und lauffähig, aber bewusst noch nicht live.
+
+**`handwerkerrechnung` ist eine Referenzimplementierung, kein Livebetrieb.**
+Dasselbe Produkt läuft bereits eigenständig unter
+`handwerkerrechnung-pruefen.de` und bleibt dort. Die Nische steht in diesem
+Repository als vollständiges Beispiel dafür, wie eine Nische aussieht — an den
+Live-Werten ausgerichtet (Preise 24,90 / 39,90 €, Aufbewahrung 14 Tage,
+Anbieterdaten aus dem Impressum), aber aus den öffentlichen Seiten
+rekonstruiert und nicht aus dem Quellcode des Bestands portiert.
+
+**Vor dem ersten Deploy** muss deshalb eine Entscheidung fallen, sonst stehen
+zwei eigene Angebote auf denselben Suchbegriffen:
+
+- `active: false` in `config/niches/handwerkerrechnung.ts` — die Engine geht
+  nur mit neuen Nischen live. **Das ist der aktuell vorgesehene Weg.**
+- oder der Bestand wird abgelöst: `handwerkerrechnung-pruefen.de` per 301 auf
+  `<dachdomain>/handwerkerrechnung`, Domain zusätzlich in `aliasDomains`.
+
+Produktiv startet die Engine mit der ersten neuen Nische. Welche das wird,
+entscheidet [Gate 0](docs/gate-0.md).
+
+---
+
 ## Die harte Architektur-Regel
 
 Eine neue Nische darf ausschließlich bestehen aus:

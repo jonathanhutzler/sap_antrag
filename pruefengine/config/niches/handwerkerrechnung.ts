@@ -2,12 +2,29 @@ import type { NicheConfig } from '../schema';
 import { catalogue } from '../catalogues/handwerkerrechnung.2026-08-01';
 
 /**
- * Nische 1 — Handwerkerrechnung.
+ * Nische 1 — Handwerkerrechnung. REFERENZIMPLEMENTIERUNG, nicht produktiv.
  *
- * Migration des Bestandsprodukts handwerkerrechnung-pruefen.de in die Engine.
- * Ziel ist ausdrücklich kein neues Feature, sondern der Nachweis, dass die
- * Engine das bestehende Produkt ohne Funktionsverlust trägt. Preise
- * unverändert 24,90 / 39,90 Euro.
+ * ACHTUNG vor dem Deploy: Dasselbe Produkt läuft bereits eigenständig unter
+ * handwerkerrechnung-pruefen.de. Beide gleichzeitig online bedeutet zwei
+ * eigene Angebote auf denselben Suchbegriffen, zwei Preisseiten und zwei
+ * Rechtstexte-Sätze für dieselbe Leistung. Bevor die Engine live geht, gilt
+ * genau eine der beiden Regelungen:
+ *
+ *   a) Diese Nische auf `active: false` — die Engine startet nur mit neuen
+ *      Nischen, der Bestand bleibt unter seiner Domain. Das ist der derzeit
+ *      gewählte Weg.
+ *   b) Der Bestand wird abgelöst und handwerkerrechnung-pruefen.de per 301
+ *      auf <dachdomain>/handwerkerrechnung umgeleitet, Domain zusätzlich in
+ *      `aliasDomains` eintragen.
+ *
+ * Was hier steht, ist an den Live-Werten ausgerichtet (Preise 24,90 / 39,90,
+ * Aufbewahrung 14 Tage, Anbieterdaten), aber aus den öffentlichen Seiten
+ * rekonstruiert — nicht aus dem Quellcode des Bestands portiert. Prompt,
+ * echter Prüfkatalog und PDF-Vorlage des Bestands lagen nicht vor. Der
+ * Katalog hier ist deshalb eigenständig geschnitten und deckt drei der
+ * sechs Muster, mit denen der Bestand wirbt, nicht als eigene Prüfpunkte ab
+ * (aufgerundete Arbeitszeit im Viertelstunden-Takt, Fahrzeit zusätzlich zur
+ * Anfahrtspauschale, zweiter Monteur ohne erkennbaren Grund).
  */
 export const handwerkerrechnung: NicheConfig = {
   slug: 'handwerkerrechnung',
