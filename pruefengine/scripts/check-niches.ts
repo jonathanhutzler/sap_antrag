@@ -14,6 +14,9 @@ import path from 'path';
 import { registry } from '../config/registry';
 import { hasPlaceholders, site } from '../config/site';
 import { buildSystemPrompt } from '../lib/prompt';
+import { getCalculator } from '../lib/calculators';
+import { SERIES } from '../lib/data/zinsreihe';
+import { getFreeTool } from '../components/freetools';
 import type { NicheConfig } from '../config/schema';
 
 let errors = 0;
@@ -140,14 +143,67 @@ function checkActive(niche: NicheConfig): void {
     warn(where, `nur ${articles.length} Artikel im Silo content/blog/${niche.slug}/ — angepeilt sind 8 bis 10.`);
   }
 
-  // 7. Der generierte Prompt muss den Katalog tatsächlich enthalten
-  const prompt = buildSystemPrompt(niche);
-  const missing = niche.catalogue.checks.filter((c) => !prompt.includes(c.id));
-  if (missing.length > 0) {
-    fail(where, `${missing.length} Prüfpunkte stehen nicht im generierten System-Prompt.`);
+  // 7. Der generierte Prompt muss den Katalog tatsächlich enthalten.
+  //    Bei Rechennischen wendet nicht das Modell den Katalog an, sondern der
+  //    Rechner — dort ist die Prüfung deshalb eine andere.
+  if (!niche.computePipeline) {
+    const prompt = buildSystemPrompt(niche);
+    const missing = niche.catalogue.checks.filter((c) => !prompt.includes(c.id));
+    if (missing.length > 0) {
+      fail(where, `${missing.length} Prüfpunkte stehen nicht im generierten System-Prompt.`);
+    }
+  } else {
+    const pipeline = niche.computePipeline;
+
+    if (!getCalculator(pipeline.calculator)) {
+      fail(where, `Rechner „${pipeline.calculator}" ist nicht in lib/calculators/index.ts registriert.`);
+    }
+
+    // Das Extraktionsschema darf keine Bewertungsfelder haben. Genau darüber
+    // würde die Trennung zwischen Ablesen und Rechnen wieder aufweichen.
+    const schema = pipeline.extractionTool.input_schema as { properties?: Record<string, unknown> };
+    const verboten = ['findings', 'bewertung', 'einschaetzung', 'urteil', 'empfehlung', 'schaden', 'vfeBerechnetEuro'];
+    for (const key of Object.keys(schema.properties ?? {})) {
+      if (verboten.some((v) => key.toLowerCase().includes(v.toLowerCase()))) {
+        fail(
+          where,
+          `Extraktionsschema enthält das Feld „${key}". Ein Rechner-Modell liest ab und bewertet nicht.`,
+        );
+      }
+    }
+
+    if (pipeline.tolerancePercent <= 0) {
+      warn(where, 'tolerancePercent ist 0 — jede noch so kleine Abweichung erzeugt eine Feststellung.');
+    }
+
+    if (pipeline.dataSources.length === 0) {
+      warn(where, 'computePipeline ohne dataSources — im Bericht steht dann nicht, worauf gerechnet wurde.');
+    }
+
+    if (!SERIES.verified) {
+      fail(
+        where,
+        `Rechennische, aber die Zinsreihe „${SERIES.id}" ist nicht verifiziert. Kennung, Bezugsquelle und historische Stände prüfen, dann RATE_SERIES_VERIFIED=true setzen.`,
+      );
+    }
   }
 
-  // 8. Alias-Domains bleiben Alias
+  // 8. Kostenlose Werkzeuge müssen umgesetzt sein
+  for (const tool of niche.freeTools ?? []) {
+    if (!getFreeTool(tool.id)) {
+      fail(where, `Kostenloses Werkzeug „${tool.id}" ist nicht in components/freetools/index.ts registriert.`);
+    }
+    if (!tool.slug || !tool.title || !tool.intro) {
+      fail(where, `Kostenloses Werkzeug „${tool.id}" ist unvollständig konfiguriert.`);
+    }
+  }
+
+  // 9. Ausdrückliche Blocker der Nische
+  for (const blocker of niche.legal.blockers ?? []) {
+    fail(where, `Blocker: ${blocker}`);
+  }
+
+  // 10. Alias-Domains bleiben Alias
   for (const domain of niche.aliasDomains) {
     if (domain === site.domain) {
       fail(where, 'aliasDomains enthält die Dachdomain. Kanonisch bleibt der Pfad unter der Dachdomain.');

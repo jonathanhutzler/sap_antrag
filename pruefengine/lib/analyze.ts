@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import type { NicheConfig } from '@/config/schema';
 import type { ParsedDoc } from './parse';
-import { buildSystemPrompt, buildUserPreamble } from './prompt';
+import { buildExtractionPrompt, buildSystemPrompt, buildUserPreamble } from './prompt';
 
 /**
  * Modellaufruf.
@@ -60,12 +60,18 @@ function toContentBlock(doc: ParsedDoc): Anthropic.ContentBlockParam {
   };
 }
 
-export async function analyze(
+/**
+ * Ein Modellaufruf mit erzwungenem Werkzeug. Gemeinsame Basis für beide
+ * Produktklassen — den Unterschied machen System-Prompt und Werkzeug.
+ */
+async function callTool(
   niche: NicheConfig,
   docs: ParsedDoc[],
   context: Record<string, string>,
   anchorCents: number | null,
-): Promise<{ raw: RawAnalysis; model: string; usage: { input: number; output: number } }> {
+  system: string,
+  tool: { name: string; description: string; input_schema: Record<string, unknown> },
+): Promise<{ input: Record<string, unknown>; model: string; usage: { input: number; output: number } }> {
   const anthropic = getClient();
 
   const content: Anthropic.ContentBlockParam[] = [
@@ -82,15 +88,15 @@ export async function analyze(
     message = await anthropic.messages.create({
       model: niche.ai.model,
       max_tokens: maxTokens,
-      system: buildSystemPrompt(niche),
+      system,
       tools: [
         {
-          name: niche.ai.outputTool.name,
-          description: niche.ai.outputTool.description,
-          input_schema: niche.ai.outputTool.input_schema as Anthropic.Tool['input_schema'],
+          name: tool.name,
+          description: tool.description,
+          input_schema: tool.input_schema as Anthropic.Tool['input_schema'],
         },
       ],
-      tool_choice: { type: 'tool', name: niche.ai.outputTool.name },
+      tool_choice: { type: 'tool', name: tool.name },
       messages: [{ role: 'user', content }],
     });
   } catch (err) {
@@ -105,8 +111,7 @@ export async function analyze(
   }
 
   const toolUse = message.content.find(
-    (block): block is Anthropic.ToolUseBlock =>
-      block.type === 'tool_use' && block.name === niche.ai.outputTool.name,
+    (block): block is Anthropic.ToolUseBlock => block.type === 'tool_use' && block.name === tool.name,
   );
 
   if (!toolUse) {
@@ -116,24 +121,106 @@ export async function analyze(
     throw new AnalyzeError('Das Dokument ist für eine Prüfung in einem Durchgang zu umfangreich.');
   }
 
-  const input = toolUse.input as Partial<RawAnalysis>;
+  return {
+    input: toolUse.input as Record<string, unknown>,
+    model: message.model,
+    usage: { input: message.usage.input_tokens, output: message.usage.output_tokens },
+  };
+}
+
+/** Dokumentnische: das Modell liest, findet und formuliert. */
+export async function analyze(
+  niche: NicheConfig,
+  docs: ParsedDoc[],
+  context: Record<string, string>,
+  anchorCents: number | null,
+): Promise<{ raw: RawAnalysis; model: string; usage: { input: number; output: number } }> {
+  const { input, model, usage } = await callTool(
+    niche,
+    docs,
+    context,
+    anchorCents,
+    buildSystemPrompt(niche),
+    niche.ai.outputTool,
+  );
+
+  const typed = input as Partial<RawAnalysis>;
 
   return {
     raw: {
-      assessable: input.assessable === true,
-      notAssessableReason: typeof input.notAssessableReason === 'string' ? input.notAssessableReason : undefined,
-      detectedDocType: typeof input.detectedDocType === 'string' ? input.detectedDocType : 'unbekannt',
-      docSummary: typeof input.docSummary === 'string' ? input.docSummary : '',
+      assessable: typed.assessable === true,
+      notAssessableReason: typeof typed.notAssessableReason === 'string' ? typed.notAssessableReason : undefined,
+      detectedDocType: typeof typed.detectedDocType === 'string' ? typed.detectedDocType : 'unbekannt',
+      docSummary: typeof typed.docSummary === 'string' ? typed.docSummary : '',
       documentTotalEuro:
-        typeof input.documentTotalEuro === 'number' && Number.isFinite(input.documentTotalEuro)
-          ? input.documentTotalEuro
+        typeof typed.documentTotalEuro === 'number' && Number.isFinite(typed.documentTotalEuro)
+          ? typed.documentTotalEuro
           : undefined,
-      checkedIds: Array.isArray(input.checkedIds) ? input.checkedIds.filter((c): c is string => typeof c === 'string') : [],
-      findings: Array.isArray(input.findings)
-        ? input.findings.filter((f): f is Record<string, unknown> => !!f && typeof f === 'object')
+      checkedIds: Array.isArray(typed.checkedIds)
+        ? typed.checkedIds.filter((c): c is string => typeof c === 'string')
+        : [],
+      findings: Array.isArray(typed.findings)
+        ? typed.findings.filter((f): f is Record<string, unknown> => !!f && typeof f === 'object')
         : [],
     },
-    model: message.model,
-    usage: { input: message.usage.input_tokens, output: message.usage.output_tokens },
+    model,
+    usage,
+  };
+}
+
+/**
+ * Rechennische: das Modell extrahiert ausschließlich Parameter.
+ *
+ * Die Werte kommen flach zurück — jeder Parameter als Objekt mit `wert`,
+ * `gefunden` und `quelle`. Nur was `gefunden: true` trägt, wird an den Rechner
+ * weitergereicht; alles andere gilt als nicht im Dokument vorhanden. Damit
+ * kann ein Wert, den das Modell aus Höflichkeit ausgefüllt hat, nicht
+ * versehentlich in eine Berechnung geraten.
+ */
+export async function extractParameters(
+  niche: NicheConfig,
+  docs: ParsedDoc[],
+  context: Record<string, string>,
+  anchorCents: number | null,
+): Promise<{
+  params: Record<string, unknown>;
+  sources: Record<string, string>;
+  docType: string;
+  model: string;
+  usage: { input: number; output: number };
+}> {
+  const pipeline = niche.computePipeline;
+  if (!pipeline) throw new AnalyzeError('Für diese Prüfung ist kein Rechenweg hinterlegt.');
+
+  const { input, model, usage } = await callTool(
+    niche,
+    docs,
+    context,
+    anchorCents,
+    buildExtractionPrompt(niche),
+    pipeline.extractionTool,
+  );
+
+  const params: Record<string, unknown> = {};
+  const sources: Record<string, string> = {};
+
+  for (const [key, value] of Object.entries(input)) {
+    if (key === 'dokumentart') continue;
+    if (!value || typeof value !== 'object' || Array.isArray(value)) continue;
+
+    const entry = value as { wert?: unknown; gefunden?: unknown; quelle?: unknown };
+    if (entry.gefunden !== true) continue;
+    if (entry.wert === null || entry.wert === undefined || entry.wert === '') continue;
+
+    params[key] = entry.wert;
+    if (typeof entry.quelle === 'string') sources[key] = entry.quelle;
+  }
+
+  return {
+    params,
+    sources,
+    docType: typeof input.dokumentart === 'string' ? input.dokumentart : 'unbekannt',
+    model,
+    usage,
   };
 }

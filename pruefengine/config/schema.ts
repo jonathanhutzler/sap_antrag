@@ -44,6 +44,8 @@ export const REPORT_SECTIONS = [
   'findings',
   'actions',
   'euro',
+  /** Nur bei Rechennischen: Eingangswerte, Rechenschritte, Zinsreihe, Band. */
+  'calculation',
   'letter',
   'checklist',
   'method',
@@ -100,7 +102,20 @@ export interface NicheConfig {
     maxPages: number;
     /** Anker gegen Lesefehler: der Nutzer nennt die Summe selbst. */
     anchorField: { label: string; type: 'currency' | 'number'; hint?: string };
-    contextFields: Array<{ id: string; label: string; options: string[] }>;
+    /**
+     * Kontextangaben. `options` macht daraus ein Auswahlfeld — dann geht nur
+     * ein Wert aus dieser Liste in den Prompt, nie Freitext. `type: 'date'`
+     * für Stichtage, die eine Rechennische als Eingangsgröße braucht.
+     */
+    contextFields: Array<{
+      id: string;
+      label: string;
+      options?: string[];
+      type?: 'select' | 'date';
+      hint?: string;
+      /** Fehlt der Wert, wird gar nicht erst analysiert. */
+      required?: boolean;
+    }>;
   };
 
   catalogue: Catalogue;
@@ -109,7 +124,11 @@ export interface NicheConfig {
     model: string;
     /** Wird aus dem Katalog generiert, siehe lib/prompt.ts. */
     systemPrompt: string;
-    /** JSON-Schema des erzwungenen Ausgabe-Tools. */
+    /**
+     * JSON-Schema des erzwungenen Ausgabe-Tools.
+     * Bei gesetzter `computePipeline` wird stattdessen deren
+     * `extractionTool` verwendet — siehe dort.
+     */
     outputTool: {
       name: string;
       description: string;
@@ -117,6 +136,65 @@ export interface NicheConfig {
     };
     maxTokens: number;
   };
+
+  /**
+   * Zweite Produktklasse: Rechennische statt Dokumentnische.
+   *
+   *   Dokumentnische: PDF → Modell liest, findet, formuliert → Feststellungen
+   *   Rechennische:   PDF → Modell extrahiert NUR Parameter
+   *                       → deterministischer Rechner im Code
+   *                       → Vergleich fremder Wert gegen eigenen Wert
+   *                       → Feststellungen aus der Differenz
+   *
+   * Der Grund für die Trennung ist nicht Eleganz, sondern Haftung: Ein
+   * Sprachmodell darf in einem Streit über einen fünfstelligen Betrag keine
+   * Zahlen selbst ausrechnen. Eine halluzinierte Barwertberechnung ist kein
+   * Schönheitsfehler.
+   *
+   * Ist dieses Feld gesetzt, gilt:
+   * - Das Modell wird ausschließlich zur Parameterextraktion aufgerufen.
+   * - `extractionTool` darf keine Felder für Bewertungen, Urteile oder
+   *   selbst errechnete Beträge enthalten. Es extrahiert, was dasteht.
+   * - Fehlt ein Pflichtparameter, ist das Ergebnis „nicht beurteilbar" und
+   *   es wird kein Kauf angeboten. Nicht geschätzt.
+   * - Euro-Beträge des Rechners werden im Sanitizing NICHT gedeckelt: Die
+   *   Deckelung existiert gegen Modellhalluzination, nicht gegen eigenen Code.
+   */
+  computePipeline?: {
+    /** Zugleich der Modulname unter lib/calculators/<id>.ts. */
+    id: string;
+    /** JSON-Schema der Extraktion. Nur Parameter, keine Bewertung. */
+    extractionTool: {
+      name: string;
+      description: string;
+      input_schema: Record<string, unknown>;
+    };
+    /** Registrierter Rechner, siehe lib/calculators/index.ts. */
+    calculator: string;
+    /**
+     * Externe Datenreihen, die der Rechner braucht — mit Kennung, damit im
+     * Bericht steht, worauf gerechnet wurde.
+     */
+    dataSources: string[];
+    /** Erst ab dieser Abweichung entsteht eine Feststellung. */
+    tolerancePercent: number;
+  };
+
+  /**
+   * Kostenlose Werkzeuge ohne Upload und ohne Bezahlschranke.
+   * `id` wählt eine von der Engine bereitgestellte Umsetzung
+   * (lib/freetools/index.ts); eine neue Nische bekommt ihr Werkzeug damit
+   * über Config statt über eine eigene Route.
+   */
+  freeTools?: Array<{
+    id: string;
+    /** URL-Segment unter der Nische. */
+    slug: string;
+    title: string;
+    intro: string;
+    /** Überleitung zur kostenpflichtigen Prüfung. */
+    cta: string;
+  }>;
 
   pricing: {
     preview: { visibleFindings: number; hideEuroTotal: true };
@@ -141,6 +219,19 @@ export interface NicheConfig {
     dataRetentionHours: number;
     /** Ein Satz für die Leistungsbeschreibung in den AGB, aus der Registry generiert. */
     serviceDescription: string;
+    /**
+     * Zusätzliche verbotene Begriffe dieser Nische, über die global
+     * geltenden hinaus (lib/sanitize.ts). `replacement: null` löscht den
+     * ganzen Satz, in dem der Begriff steht.
+     */
+    forbiddenTerms?: Array<{ stem: string; replacement: string | null; label: string }>;
+    /**
+     * Sperrt die Nische trotz `active: true`, solange offene Punkte
+     * bestehen — `check:niches` bricht dann mit Nennung der Gründe ab.
+     * Gedacht für Nischen, die vor dem Livegang eine fachliche Freigabe
+     * brauchen.
+     */
+    blockers?: string[];
   };
 
   landing: {
@@ -182,6 +273,30 @@ export interface Finding {
   euroCapped?: boolean;
 }
 
+/**
+ * Ergebnis einer Rechennische. Wird vollständig mitgespeichert, damit ein
+ * Bericht Monate später reproduzierbar ist: dieselben Eingangswerte plus
+ * dieselbe Zinsreihe zum selben Stand ergeben dasselbe Band.
+ */
+export interface ComputeResult {
+  calculatorId: string;
+  /** Eigenes Ergebnis als Band, nie als Punktwert. */
+  band: [number, number] | null;
+  /** Was die Gegenseite fordert — aus dem Ankerfeld, nicht aus dem Modell. */
+  claimEuro: number | null;
+  /** Abweichung der Forderung vom oberen bzw. unteren Bandrand, in Prozent. */
+  deviationPercent: number | null;
+  position: 'innerhalb' | 'oberhalb' | 'unterhalb' | null;
+  /** Pflichtparameter, die im Dokument fehlten. Nicht leer => nicht beurteilbar. */
+  missingParams: string[];
+  /** Verwendete Eingangswerte, wie sie in den Rechner gingen. */
+  inputs: Record<string, unknown>;
+  /** Nachvollziehbare Zwischenschritte für den Berichtsabschnitt. */
+  steps: Array<{ label: string; value: string; note?: string }>;
+  dataSource: { id: string; asOf: string; verified: boolean };
+  computedAt: string;
+}
+
 export interface AnalysisResult {
   id: string;
   niche: string;
@@ -199,6 +314,8 @@ export interface AnalysisResult {
   euroTotal: [number, number] | null;
   checkedIds: string[];
   model: string;
+  /** Nur bei Rechennischen gesetzt. */
+  compute?: ComputeResult;
   paid: boolean;
   tier?: string;
   paidAt?: string;

@@ -27,7 +27,14 @@ export interface FlowConfig {
   maxMbPerFile: number;
   maxPages: number;
   anchorField: { label: string; type: 'currency' | 'number'; hint?: string };
-  contextFields: Array<{ id: string; label: string; options: string[] }>;
+  contextFields: Array<{
+    id: string;
+    label: string;
+    type: 'select' | 'date';
+    options: string[];
+    hint?: string;
+    required: boolean;
+  }>;
   catalogueVersion: string;
   catalogueSize: number;
   experimentId: string;
@@ -61,7 +68,28 @@ interface PreviewResponse {
   catalogueSize?: number;
   sample?: PreviewSample[];
   hiddenFindings?: number;
+  /** Nur Rechennischen: Lage der Forderung zum errechneten Band. */
+  position?: 'innerhalb' | 'oberhalb' | 'unterhalb' | null;
 }
+
+/**
+ * Die Kernaussage einer Rechennische in der Vorschau — ohne jede Zahl.
+ * Das Band, die Differenz und die Rechenschritte sind die bezahlte Leistung.
+ */
+const POSITION_TEXT: Record<'innerhalb' | 'oberhalb' | 'unterhalb', { titel: string; text: string }> = {
+  oberhalb: {
+    titel: 'Die Forderung liegt über dem errechneten Band',
+    text: 'Der von Ihnen genannte Betrag liegt oberhalb dessen, was die eigene Nachrechnung ergibt. Wie groß der Abstand ist und woraus er sich rechnerisch ergibt, steht im Vollbericht.',
+  },
+  innerhalb: {
+    titel: 'Die Forderung liegt innerhalb des errechneten Bandes',
+    text: 'Der von Ihnen genannte Betrag liegt in dem Bereich, den die eigene Nachrechnung ergibt. Der Vollbericht zeigt Ihnen das Band, den Rechenweg und die einzelnen Feststellungen.',
+  },
+  unterhalb: {
+    titel: 'Die Forderung liegt unter dem errechneten Band',
+    text: 'Der von Ihnen genannte Betrag liegt unterhalb dessen, was die eigene Nachrechnung ergibt. Auch das steht mit Rechenweg im Vollbericht.',
+  },
+};
 
 const ACCEPT_MIME: Record<string, string> = {
   pdf: 'application/pdf',
@@ -219,21 +247,40 @@ export function PruefFlow({ config }: { config: FlowConfig }) {
           <div key={field.id} className="mt-6">
             <label htmlFor={field.id} className="field-label">
               {field.label}
+              {field.required && <span className="text-severity-error"> *</span>}
             </label>
-            <select
-              id={field.id}
-              name={field.id}
-              value={context[field.id] ?? ''}
-              onChange={(e) => setContext((prev) => ({ ...prev, [field.id]: e.target.value }))}
-              className="field"
-            >
-              <option value="">Keine Angabe</option>
-              {field.options.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+
+            {field.type === 'date' ? (
+              // Stichtage sind bei Rechennischen Eingangsgrößen, keine
+              // Zusatzinfo — deshalb ein echtes Datumsfeld statt Freitext.
+              <input
+                id={field.id}
+                name={field.id}
+                type="date"
+                required={field.required}
+                value={context[field.id] ?? ''}
+                onChange={(e) => setContext((prev) => ({ ...prev, [field.id]: e.target.value }))}
+                className="field"
+              />
+            ) : (
+              <select
+                id={field.id}
+                name={field.id}
+                required={field.required}
+                value={context[field.id] ?? ''}
+                onChange={(e) => setContext((prev) => ({ ...prev, [field.id]: e.target.value }))}
+                className="field"
+              >
+                <option value="">Keine Angabe</option>
+                {field.options.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {field.hint && <p className="mt-1.5 font-sans text-xs text-ink-faint">{field.hint}</p>}
           </div>
         ))}
 
@@ -340,6 +387,15 @@ export function PruefFlow({ config }: { config: FlowConfig }) {
                       </li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {preview.position && (
+                <div className="mt-6 rounded-card border border-accent bg-accent-soft p-5">
+                  <p className="font-display text-lg text-ink">{POSITION_TEXT[preview.position].titel}</p>
+                  <p className="mt-1.5 font-sans text-[0.92rem] leading-relaxed text-ink-muted">
+                    {POSITION_TEXT[preview.position].text}
+                  </p>
                 </div>
               )}
 

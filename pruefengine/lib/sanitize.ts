@@ -1,5 +1,6 @@
 import type { AnalysisResult, Finding, NicheConfig, Severity } from '@/config/schema';
 import type { RawAnalysis } from './analyze';
+import type { CalculatorOutput } from './calculators/types';
 
 /**
  * Zweite Verteidigungslinie hinter dem System-Prompt.
@@ -56,6 +57,17 @@ function patternFor(stem: string): RegExp {
   return new RegExp(`(?<!\\p{L})${escaped}\\p{L}*`, 'giu');
 }
 
+type ForbiddenRule = { stem: string; replacement: string | null; label: string };
+
+/**
+ * Global geltende Begriffe plus die zusätzlichen dieser Nische.
+ * Bei Rechennischen sind die zusätzlichen der eigentliche Schutz: Der Bericht
+ * darf nachrechnen und fragen, aber nicht beurteilen.
+ */
+function rulesFor(niche: NicheConfig): ForbiddenRule[] {
+  return [...FORBIDDEN, ...(niche.legal.forbiddenTerms ?? [])];
+}
+
 
 /** Ein einzelner Fund darf höchstens diesen Anteil der Dokumentsumme ausmachen. */
 const MAX_SHARE_PER_FINDING = 0.4;
@@ -73,10 +85,15 @@ function splitSentences(text: string): string[] {
  * Wortfilter auf einem Textfeld. Ersetzbare Begriffe werden ersetzt, nicht
  * ersetzbare löschen den Satz, in dem sie stehen.
  */
-function filterWords(text: string, log: string[], where: string): string {
+function filterWords(
+  text: string,
+  log: string[],
+  where: string,
+  rules: ForbiddenRule[] = FORBIDDEN,
+): string {
   let working = text;
 
-  for (const rule of FORBIDDEN) {
+  for (const rule of rules) {
     if (!rule.replacement) continue;
     const pattern = patternFor(rule.stem);
     if (pattern.test(working)) {
@@ -86,7 +103,7 @@ function filterWords(text: string, log: string[], where: string): string {
   }
 
   const kept = splitSentences(working).filter((sentence) => {
-    for (const rule of FORBIDDEN) {
+    for (const rule of rules) {
       if (rule.replacement) continue;
       if (patternFor(rule.stem).test(sentence)) {
         log.push(`Regel 1: Satz mit „${rule.label}" in ${where} entfernt.`);
@@ -139,6 +156,7 @@ export function sanitize({
   id,
 }: SanitizeInput): AnalysisResult {
   const log: string[] = [];
+  const rules = rulesFor(niche);
   const checksById = new Map(niche.catalogue.checks.map((c) => [c.id, c]));
 
   const base: AnalysisResult = {
@@ -148,7 +166,7 @@ export function sanitize({
     experimentId: niche.experiment.id,
     createdAt: new Date().toISOString(),
     assessable: raw.assessable,
-    docSummary: filterWords(clean(raw.docSummary), log, 'Zusammenfassung'),
+    docSummary: filterWords(clean(raw.docSummary), log, 'Zusammenfassung', rules),
     anchorValueCents: anchorCents,
     context,
     findings: [],
@@ -165,6 +183,7 @@ export function sanitize({
       clean(raw.notAssessableReason) || 'Das hochgeladene Dokument konnte nicht geprüft werden.',
       log,
       'Begründung',
+      rules,
     );
     return { ...base, assessable: false, notAssessableReason: reason, docSummary: '' };
   }
@@ -199,8 +218,8 @@ export function sanitize({
       continue;
     }
 
-    const observation = filterWords(clean(rawFinding.observation), log, `${checkId}/Feststellung`);
-    const action = filterWords(normalizeAction(clean(rawFinding.action)), log, `${checkId}/Handlung`);
+    const observation = filterWords(clean(rawFinding.observation), log, `${checkId}/Feststellung`, rules);
+    const action = filterWords(normalizeAction(clean(rawFinding.action)), log, `${checkId}/Handlung`, rules);
 
     if (!observation) {
       log.push(`${checkId}: Fund ohne verbleibende Feststellung verworfen.`);
@@ -369,4 +388,142 @@ export function previewStats(result: AnalysisResult): {
   }
 
   return { counts, total: result.findings.length, categories: Array.from(categories) };
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Rechennischen
+   ══════════════════════════════════════════════════════════════════════════ */
+
+export interface SanitizeComputedInput {
+  output: CalculatorOutput;
+  niche: NicheConfig;
+  anchorCents: number | null;
+  context: Record<string, string>;
+  model: string;
+  id: string;
+  /** Fundstellen aus der Extraktion, je Parameter. */
+  sources: Record<string, string>;
+}
+
+/**
+ * Sanitizing für Rechennischen.
+ *
+ * Unterschied zur Dokumentnische, bewusst und wichtig: Die Euro-Beträge
+ * werden hier NICHT gedeckelt. Die Deckelung existiert gegen halluzinierte
+ * Zahlen eines Sprachmodells. Diese Zahlen kommen aus getestetem Rechencode —
+ * sie nachträglich zu beschneiden würde ein korrektes Ergebnis verfälschen
+ * und wäre bei einer Reklamation nicht erklärbar.
+ *
+ * Was bleibt: der Wortfilter. Er ist hier sogar strenger, weil die Nische
+ * eigene verbotene Begriffe mitbringen kann (`legal.forbiddenTerms`) — der
+ * Bericht darf nachrechnen und fragen, aber nicht beurteilen.
+ */
+export function sanitizeComputed({
+  output,
+  niche,
+  anchorCents,
+  context,
+  model,
+  id,
+  sources,
+}: SanitizeComputedInput): AnalysisResult {
+  const log: string[] = [];
+  const rules = rulesFor(niche);
+  const checksById = new Map(niche.catalogue.checks.map((c) => [c.id, c]));
+
+  const base: AnalysisResult = {
+    id,
+    niche: niche.slug,
+    catalogueVersion: niche.catalogue.version,
+    experimentId: niche.experiment.id,
+    createdAt: new Date().toISOString(),
+    assessable: output.assessable,
+    docSummary: filterWords(clean(output.summary), log, 'Zusammenfassung', rules),
+    anchorValueCents: anchorCents,
+    context,
+    findings: [],
+    euroTotal: null,
+    checkedIds: [],
+    model,
+    compute: output.compute,
+    paid: false,
+    sanitizeLog: log,
+  };
+
+  // Fehlender Pflichtparameter: harter Abbruch vor dem Bezahl-Gate.
+  if (!output.assessable) {
+    const reason = filterWords(
+      clean(output.notAssessableReason) || 'Die Unterlagen reichen für eine Nachrechnung nicht aus.',
+      log,
+      'Begründung',
+      rules,
+    );
+    return { ...base, assessable: false, notAssessableReason: reason, docSummary: '' };
+  }
+
+  const findings: Finding[] = [];
+
+  for (const calcFinding of output.findings) {
+    const check = checksById.get(calcFinding.checkId);
+    if (!check) {
+      log.push(`Fund mit unbekannter Prüfpunkt-ID „${calcFinding.checkId}" verworfen.`);
+      continue;
+    }
+
+    const observation = filterWords(
+      clean(calcFinding.observation),
+      log,
+      `${calcFinding.checkId}/Feststellung`,
+      rules,
+    );
+    const action = filterWords(
+      normalizeAction(clean(calcFinding.action)),
+      log,
+      `${calcFinding.checkId}/Handlung`,
+      rules,
+    );
+
+    if (!observation) {
+      log.push(`${calcFinding.checkId}: Fund ohne verbleibende Feststellung verworfen.`);
+      continue;
+    }
+    if (!action) {
+      log.push(`${calcFinding.checkId}: Fund ohne Handlungssatz verworfen.`);
+      continue;
+    }
+
+    findings.push({
+      checkId: calcFinding.checkId,
+      label: check.label,
+      category: check.category,
+      severity: calcFinding.severity ?? check.severity,
+      observation,
+      // Fundstelle aus der Extraktion, sonst die des Rechners.
+      documentRef: sources[calcFinding.checkId] ?? clean(calcFinding.documentRef),
+      action,
+      basis: check.basis,
+      euroImpact: calcFinding.euroImpact
+        ? [Math.round(calcFinding.euroImpact[0]), Math.round(calcFinding.euroImpact[1])]
+        : undefined,
+    });
+  }
+
+  const order: Record<Severity, number> = { error: 0, warn: 1, info: 2 };
+  findings.sort((a, b) => {
+    if (order[a.severity] !== order[b.severity]) return order[a.severity] - order[b.severity];
+    return (b.euroImpact?.[1] ?? 0) - (a.euroImpact?.[1] ?? 0);
+  });
+
+  log.push(
+    'Rechennische: Euro-Beträge stammen aus geprüftem Rechencode und werden nicht gedeckelt.',
+  );
+
+  return {
+    ...base,
+    findings,
+    // Die Gesamtaussage ist das Band des Rechners, nicht eine Summe der Funde.
+    euroTotal: output.compute.band,
+    checkedIds: niche.catalogue.checks.map((c) => c.id),
+    sanitizeLog: log,
+  };
 }

@@ -32,6 +32,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       });
     }
 
+    // Kostenlose Werkzeuge tragen organisch und gehören deshalb weit nach oben.
+    for (const tool of niche.freeTools ?? []) {
+      entries.push({
+        url: siteUrl(`/${niche.slug}/${tool.slug}`),
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.8,
+      });
+    }
+
     const articles = listArticles(niche.slug);
     if (articles.length > 0) {
       entries.push({

@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
+import type { AnalysisResult, NicheConfig } from '@/config/schema';
 import { resolveNicheOrNull } from '@/lib/resolveNiche';
-import { ParseError, parseAnchorToCents, parseUploads } from '@/lib/parse';
-import { AnalyzeError, analyze } from '@/lib/analyze';
-import { canPurchase, previewFindings, previewStats, sanitize } from '@/lib/sanitize';
+import { ParseError, parseAnchorToCents, parseUploads, type ParsedDoc } from '@/lib/parse';
+import { AnalyzeError, analyze, extractParameters } from '@/lib/analyze';
+import { canPurchase, previewFindings, previewStats, sanitize, sanitizeComputed } from '@/lib/sanitize';
+import { getCalculator } from '@/lib/calculators';
+import { SERIES } from '@/lib/data/zinsreihe';
 import { saveResult } from '@/lib/store';
 import { checkRateLimit, clientIp } from '@/lib/ratelimit';
 import { newResultId } from '@/lib/id';
@@ -10,6 +13,55 @@ import { trackServer } from '@/lib/events';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
+
+/** Dokumentnische: das Modell liest, findet und formuliert. */
+async function runDocumentAnalysis(
+  niche: NicheConfig,
+  docs: ParsedDoc[],
+  context: Record<string, string>,
+  anchorCents: number | null,
+  id: string,
+): Promise<AnalysisResult> {
+  const { raw, model } = await analyze(niche, docs, context, anchorCents);
+  return sanitize({ raw, niche, anchorCents, context, model, id });
+}
+
+/**
+ * Rechennische: das Modell extrahiert nur Parameter, gerechnet wird im Code.
+ *
+ * Der Modellaufruf und die Rechnung sind hier bewusst getrennte Schritte mit
+ * getrennten Verantwortlichkeiten. Was das Modell liefert, sind Ablesewerte;
+ * was der Kunde bezahlt, ist die Rechnung darauf.
+ */
+async function runComputePipeline(
+  niche: NicheConfig,
+  docs: ParsedDoc[],
+  context: Record<string, string>,
+  anchorCents: number | null,
+  id: string,
+): Promise<AnalysisResult> {
+  const pipeline = niche.computePipeline;
+  if (!pipeline) throw new AnalyzeError('Für diese Prüfung ist kein Rechenweg hinterlegt.');
+
+  const calculator = getCalculator(pipeline.calculator);
+  if (!calculator) {
+    throw new AnalyzeError(`Der Rechner „${pipeline.calculator}" ist nicht registriert.`);
+  }
+
+  const { params, sources, model } = await extractParameters(niche, docs, context, anchorCents);
+
+  const output = calculator(params, {
+    // Der Anker des Nutzers schlägt jeden extrahierten Wert. Bei einer
+    // Forderung im fünfstelligen Bereich ist die Zahl, die der Kunde selbst
+    // abgelesen hat, verlässlicher als jede Texterkennung.
+    claimEuro: anchorCents !== null ? anchorCents / 100 : null,
+    context,
+    tolerancePercent: pipeline.tolerancePercent,
+    series: SERIES,
+  });
+
+  return sanitizeComputed({ output, niche, anchorCents, context, model, id, sources });
+}
 
 /**
  * Upload → Analyse → Vorschau.
@@ -49,10 +101,27 @@ export async function POST(request: Request) {
   const anchorCents = parseAnchorToCents(String(form.get('anchor') || ''));
 
   const context: Record<string, string> = {};
+  const missingRequired: string[] = [];
+
   for (const field of niche.input.contextFields) {
-    const value = String(form.get(`ctx_${field.id}`) || '');
-    // Nur Werte aus der Config übernehmen — kein Freitext in den Prompt.
-    if (field.options.includes(value)) context[field.id] = value;
+    const value = String(form.get(`ctx_${field.id}`) || '').trim();
+
+    if (field.options && field.options.length > 0) {
+      // Nur Werte aus der Config übernehmen — kein Freitext in den Prompt.
+      if (field.options.includes(value)) context[field.id] = value;
+    } else if (field.type === 'date') {
+      // Nur ein sauberes ISO-Datum, nichts anderes.
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) context[field.id] = value;
+    }
+
+    if (field.required && !context[field.id]) missingRequired.push(field.label);
+  }
+
+  if (missingRequired.length > 0) {
+    return NextResponse.json(
+      { error: `Bitte ergänzen Sie: ${missingRequired.join(', ')}.` },
+      { status: 400 },
+    );
   }
 
   // Der Zähler des Funnels. Bewusst vor der Eingangsprüfung: die Zielgröße ist
@@ -66,16 +135,13 @@ export async function POST(request: Request) {
 
   try {
     const docs = await parseUploads(files, niche);
-    const { raw, model } = await analyze(niche, docs, context, anchorCents);
+    const id = newResultId();
 
-    const result = sanitize({
-      raw,
-      niche,
-      anchorCents,
-      context,
-      model,
-      id: newResultId(),
-    });
+    // Zwei Produktklassen, eine Route. Die Verzweigung hängt allein daran,
+    // ob die Nische eine Compute-Pipeline hat — nicht an ihrem Slug.
+    const result = niche.computePipeline
+      ? await runComputePipeline(niche, docs, context, anchorCents, id)
+      : await runDocumentAnalysis(niche, docs, context, anchorCents, id);
 
     await saveResult(result, niche.legal.dataRetentionHours);
 
@@ -122,6 +188,10 @@ export async function POST(request: Request) {
         basis: f.basis,
       })),
       hiddenFindings: Math.max(0, stats.total - sample.length),
+      // Rechennische: sichtbar ist NUR, ob die Forderung innerhalb, oberhalb
+      // oder unterhalb des Bandes liegt. Das Band selbst, die Differenz und
+      // die Rechenschritte bleiben hinter der Bezahlschranke.
+      position: result.compute?.position ?? null,
     });
   } catch (err) {
     if (err instanceof ParseError) {

@@ -130,17 +130,70 @@ export default async function ResultPage({
           ))}
         </div>
 
-        {result.euroTotal && (
+        {result.compute && result.compute.band ? (
           <div className="sheet mt-6 max-w-lg p-6">
-            <p className="eyebrow">Finanzielle Einordnung</p>
-            <p className="mt-2 font-display text-3xl">{euroRange(result.euroTotal)}</p>
+            <p className="eyebrow">Eigene Nachrechnung</p>
+            <p className="mt-2 font-display text-3xl">{euroRange(result.compute.band)}</p>
             <p className="mt-2 font-sans text-sm leading-relaxed text-ink-muted">
-              Summe der bezifferbaren Feststellungen als Spanne. Feststellungen zur selben Position sind nur einmal
-              gezählt. Schätzung auf Grundlage der Zahlen im Dokument, keine Forderung.
+              Ergebnis der eigenen Nachrechnung als Band. Die ersparten Kosten sind Schätzgrößen; ein Punktwert wäre
+              hier Scheingenauigkeit.
+            </p>
+            {result.compute.claimEuro !== null && result.compute.position && (
+              <p className="mt-4 border-t border-rule pt-4 font-sans text-sm text-ink">
+                Gefordert werden{' '}
+                <strong>
+                  {new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(result.compute.claimEuro)} €
+                </strong>{' '}
+                — das liegt <strong>{result.compute.position}</strong> des errechneten Bandes
+                {result.compute.position !== 'innerhalb' && result.compute.deviationPercent !== null
+                  ? ` (${result.compute.deviationPercent.toFixed(1)} %)`
+                  : ''}
+                .
+              </p>
+            )}
+            <p className="mt-3 font-sans text-xs text-ink-faint">
+              Zinsreihe {result.compute.dataSource.id}, Stand {result.compute.dataSource.asOf} · Rechner{' '}
+              {result.compute.calculatorId}
             </p>
           </div>
+        ) : (
+          result.euroTotal && (
+            <div className="sheet mt-6 max-w-lg p-6">
+              <p className="eyebrow">Finanzielle Einordnung</p>
+              <p className="mt-2 font-display text-3xl">{euroRange(result.euroTotal)}</p>
+              <p className="mt-2 font-sans text-sm leading-relaxed text-ink-muted">
+                Summe der bezifferbaren Feststellungen als Spanne. Feststellungen zur selben Position sind nur einmal
+                gezählt. Schätzung auf Grundlage der Zahlen im Dokument, keine Forderung.
+              </p>
+            </div>
+          )
         )}
       </section>
+
+      {result.compute && result.compute.steps.length > 0 && (
+        <section className="mt-14">
+          <h2 className="text-display-md">Der Rechenweg</h2>
+          <p className="mt-2 max-w-prose font-sans text-[0.95rem] text-ink-muted">
+            Jeder Eingangswert und jeder Zwischenschritt. Gerechnet hat kein Sprachmodell, sondern geprüfter
+            Programmcode — nachrechnen können Sie es damit selbst.
+          </p>
+          <dl className="mt-6 divide-y divide-rule border-t border-rule">
+            {result.compute.steps.map((step, i) => (
+              <div key={`${step.label}-${i}`} className="grid gap-1 py-4 sm:grid-cols-[14rem_1fr] sm:gap-6">
+                <dt className="font-sans text-sm text-ink-faint">{step.label}</dt>
+                <dd>
+                  <span className="font-sans text-[0.97rem] font-semibold text-ink">{step.value}</span>
+                  {step.note && (
+                    <span className="mt-1 block max-w-prose font-sans text-xs leading-relaxed text-ink-faint">
+                      {step.note}
+                    </span>
+                  )}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
 
       <section className="mt-16">
         <h2 className="text-display-md">Feststellungen</h2>

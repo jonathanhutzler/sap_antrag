@@ -110,6 +110,58 @@ export function buildSystemPrompt(niche: NicheConfig): string {
   ].join('\n');
 }
 
+/**
+ * Regeln für die Parameterextraktion einer Rechennische.
+ *
+ * Bewusst eine andere Liste als GLOBAL_RULES: Hier soll das Modell nichts
+ * feststellen, nichts bewerten und vor allem nichts ausrechnen. Es liest ab.
+ * Alles Weitere macht der Rechner in lib/calculators/.
+ */
+export const EXTRACTION_RULES = `AUFGABE — Parameter ablesen, sonst nichts.
+
+Du liest aus den angehängten Dokumenten ausschließlich Werte ab. Du bewertest
+nicht, du prüfst nicht, du rechnest nicht. Jede Bewertung und jede Rechnung
+findet danach in geprüftem Programmcode statt, nicht bei dir.
+
+1. Nur ablesen. Trage jeden Parameter genau so ein, wie er im Dokument steht.
+   Rechne nichts um, was du nicht umrechnen musst, und leite nichts her.
+
+2. Nichts raten. Steht ein Wert nicht im Dokument, setze für ihn
+   "gefunden": false und lass den Wert leer. Ein fehlender Wert ist ein
+   gültiges Ergebnis; ein erfundener Wert ist ein Schaden. Wenn du zwischen
+   zwei Lesarten schwankst, ist der Parameter nicht gefunden.
+
+3. Quelle angeben. Zu jedem gefundenen Parameter gehört in "quelle", aus
+   welchem Dokument und von welcher Seite er stammt.
+
+4. Keine Bewertung, keine Meinung. Formuliere keine Einschätzung dazu, ob ein
+   Wert hoch, niedrig, richtig oder falsch ist. Dafür gibt es in diesem
+   Werkzeug keine Felder, und es soll auch keine geben.
+
+5. Zahlen als Zahlen. Beträge in Euro ohne Tausenderpunkt und ohne
+   Währungszeichen, Dezimaltrennzeichen ist der Punkt. Zinssätze als Zahl in
+   Prozent, also 3.45 für 3,45 %. Daten im Format JJJJ-MM-TT.
+
+6. Widersprüche melden statt auflösen. Stehen zwei verschiedene Werte für
+   denselben Parameter in verschiedenen Dokumenten, nimm den aus dem
+   spezifischeren Dokument und vermerke den Widerspruch in "quelle".`;
+
+/** System-Prompt für die Parameterextraktion einer Rechennische. */
+export function buildExtractionPrompt(niche: NicheConfig): string {
+  return [
+    niche.ai.systemPrompt.trim(),
+    '',
+    EXTRACTION_RULES,
+    '',
+    `Der Prüfkatalog dieser Nische (Version ${niche.catalogue.version}) wird nach der`,
+    'Extraktion auf das Rechenergebnis angewandt — nicht von dir. Du musst ihn nicht kennen',
+    'und sollst ihn nicht anwenden.',
+    '',
+    'AUSGABE. Antworte ausschließlich mit einem Aufruf des Werkzeugs',
+    `"${niche.computePipeline?.extractionTool.name ?? 'extraktion'}". Kein Fließtext.`,
+  ].join('\n');
+}
+
 /** Nutzernachricht: Kontextangaben und Anker. */
 export function buildUserPreamble(
   niche: NicheConfig,

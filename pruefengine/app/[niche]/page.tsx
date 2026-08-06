@@ -146,6 +146,25 @@ export default function NicheLandingPage({ params }: { params: { niche: string }
         )}
       </section>
 
+      {/* Kostenlose Werkzeuge */}
+      {(niche.freeTools ?? []).length > 0 && (
+        <section className="mt-20">
+          <p className="eyebrow">Kostenlos</p>
+          <h2 className="mt-3 text-display-lg">Erst rechnen, dann entscheiden</h2>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2">
+            {(niche.freeTools ?? []).map((tool) => (
+              <Link key={tool.slug} href={`/${niche.slug}/${tool.slug}`} className="sheet group block p-7">
+                <h3 className="text-xl group-hover:text-accent-ink">{tool.title}</h3>
+                <p className="mt-2 font-sans text-[0.93rem] leading-relaxed text-ink-muted">{tool.intro}</p>
+                <span className="mt-4 inline-block font-sans text-sm font-semibold text-accent-ink underline decoration-2 underline-offset-4">
+                  Kostenlos berechnen
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Katalog-Verweis */}
       <section className="mt-20">
         <div className="sheet flex flex-wrap items-center justify-between gap-6 p-8">

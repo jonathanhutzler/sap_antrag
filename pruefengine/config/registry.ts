@@ -1,6 +1,9 @@
 import type { NicheConfig } from './schema';
 import { handwerkerrechnung } from './niches/handwerkerrechnung';
 import { nische2 } from './niches/nische-2';
+import { vorfaelligkeitsentschaedigung } from './niches/vorfaelligkeitsentschaedigung-pruefen';
+import { leasingMinderwert } from './niches/leasing-minderwert-pruefen';
+import { beihilfebescheid } from './niches/beihilfebescheid-pruefen';
 
 /**
  * Registry aller Nischen. Einziger Ort, an dem eine Nische bekannt gemacht
@@ -9,7 +12,13 @@ import { nische2 } from './niches/nische-2';
  *
  * Eine neue Nische = ein Import und ein Array-Eintrag. Mehr nicht.
  */
-export const registry: NicheConfig[] = [handwerkerrechnung, nische2];
+export const registry: NicheConfig[] = [
+  handwerkerrechnung,
+  vorfaelligkeitsentschaedigung,
+  nische2,
+  leasingMinderwert,
+  beihilfebescheid,
+];
 
 /** Nur diese Nischen sind erreichbar, im Hub sichtbar und in der Sitemap. */
 export function activeNiches(): NicheConfig[] {

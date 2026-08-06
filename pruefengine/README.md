@@ -50,7 +50,48 @@ Praktisch heißt das: Diese Dinge sind Config, nicht Code — Landing-Texte, FAQ
 Beispielansicht mit markierten Fundstellen, Uploadgrenzen, Kontextfelder,
 Prüfkatalog, System-Prompt-Rahmung, Ausgabeschema, Preisstufen und ihr
 Leistungsumfang, Berichtsabschnitte, Rechtstexte der Nische, Akzentfarbe,
-Aufbewahrungsfrist, Experimentbudget.
+Aufbewahrungsfrist, Experimentbudget, kostenlose Werkzeuge.
+
+**Eine Ausnahme gibt es, und sie war eine bewusste Engine-Erweiterung:** Eine
+*Rechennische* braucht zusätzlich einen Rechner unter `lib/calculators/` samt
+Testsuite. Siehe unten.
+
+---
+
+## Zwei Produktklassen
+
+```
+Dokumentnische:   PDF → Modell liest, findet, formuliert     → Feststellungen
+Rechennische:     PDF → Modell extrahiert NUR Parameter
+                      → deterministischer Rechner im Code
+                      → Vergleich fremder Wert gegen eigener Wert
+                      → Feststellungen aus der Differenz
+```
+
+Der Unterschied ist keine Architekturvorliebe, sondern Haftung: Ein
+Sprachmodell darf in einem Streit über einen fünfstelligen Betrag keine Zahlen
+selbst ausrechnen. Eine halluzinierte Barwertberechnung sieht genauso
+überzeugend aus wie eine richtige.
+
+Eine Nische wird zur Rechennische, indem sie `computePipeline` setzt. Dann:
+
+- ruft die Engine das Modell **ausschließlich zur Parameterextraktion** auf.
+  Das Extraktionsschema hat keine Felder für Bewertungen — `check:niches`
+  bricht ab, wenn doch eines auftaucht.
+- läuft danach der Rechner aus `lib/calculators/<id>.ts`.
+- entstehen Feststellungen aus dem Vergleich, nicht aus einer Modellmeinung.
+- ist ein fehlender Pflichtparameter „nicht beurteilbar" und **kein Kauf**.
+- werden Euro-Beträge im Sanitizing **nicht gedeckelt**: Die Deckelung
+  existiert gegen Modellhalluzination, nicht gegen eigenen, getesteten Code.
+- speichert die Engine Eingangswerte, Rechenschritte, Kennung und Stand der
+  Datenreihe — damit ein Bericht Monate später reproduzierbar ist.
+
+Ein Rechner kommt nur dann in die Registry, wenn er eine Testsuite hat.
+
+```bash
+npm run test:vfe        # 53 Prüfungen, u. a. die Kontrollrechnung
+                        # „Barwert zum eigenen Effektivzins = Restschuld"
+```
 
 ---
 

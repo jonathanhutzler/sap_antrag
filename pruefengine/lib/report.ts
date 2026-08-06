@@ -184,6 +184,42 @@ function sectionActions(doc: Doc, result: AnalysisResult): void {
 function sectionEuro(doc: Doc, result: AnalysisResult): void {
   heading(doc, 'Finanzielle Einordnung');
 
+  // Rechennische: die Aussage ist der Vergleich der Forderung mit dem Band.
+  if (result.compute) {
+    const { band, claimEuro, position, deviationPercent } = result.compute;
+    if (!band) {
+      body(doc, 'Für diese Unterlagen ließ sich kein Band ermitteln.');
+      return;
+    }
+
+    doc.font('Helvetica-Bold').fontSize(15).fillColor('#14140f').text(euroRange(band), { width: CONTENT_WIDTH });
+    doc.moveDown(0.3);
+    body(doc, 'So hoch fällt die Nachrechnung nach eigenem Rechenweg aus — als Band, nicht als Punktwert.', {
+      color: '#57564d',
+    });
+
+    if (claimEuro !== null && position) {
+      doc.moveDown(0.6);
+      labelled(
+        doc,
+        'Gefordert wird',
+        `${euroRange([Math.round(claimEuro), Math.round(claimEuro)])} — das liegt ${position} des errechneten Bandes${
+          position !== 'innerhalb' && deviationPercent !== null
+            ? ` (${deviationPercent.toFixed(1)} Prozent)`
+            : ''
+        }.`,
+      );
+    }
+
+    doc.moveDown(0.3);
+    body(
+      doc,
+      'Das Band ist eine Nachrechnung, keine Feststellung darüber, welcher Betrag geschuldet ist. Die ersparten Verwaltungs- und Risikokosten sind Schätzgrößen; ein Punktwert wäre an dieser Stelle Scheingenauigkeit.',
+      { color: '#57564d' },
+    );
+    return;
+  }
+
   if (!result.euroTotal) {
     body(
       doc,
@@ -272,6 +308,68 @@ function sectionChecklist(doc: Doc, result: AnalysisResult): void {
   }
 }
 
+/**
+ * Rechenweg einer Rechennische.
+ *
+ * Der Abschnitt existiert, damit der Bericht überprüfbar ist statt geglaubt
+ * werden zu müssen: jeder Eingangswert, jeder Zwischenschritt, die Kennung
+ * der Zinsreihe und ihr Stand. Wer nachrechnen will, kann es damit.
+ */
+function sectionCalculation(doc: Doc, result: AnalysisResult): void {
+  const compute = result.compute;
+  if (!compute) return;
+
+  heading(doc, 'Der Rechenweg');
+
+  body(
+    doc,
+    'Die folgenden Werte sind in die Nachrechnung eingegangen. Sie stammen aus Ihren Unterlagen und aus Ihren eigenen Angaben; gerechnet hat sie kein Sprachmodell, sondern geprüfter Programmcode.',
+    { color: '#57564d' },
+  );
+  doc.moveDown(0.8);
+
+  for (const step of compute.steps) {
+    if (doc.y > PAGE_HEIGHT - MARGIN - 90) doc.addPage();
+
+    const y = doc.y;
+    doc.font('Helvetica').fontSize(9.5).fillColor('#57564d').text(step.label, MARGIN, y, { width: 210 });
+    doc
+      .font('Helvetica-Bold')
+      .fontSize(9.5)
+      .fillColor('#14140f')
+      .text(step.value, MARGIN + 215, y, { width: CONTENT_WIDTH - 215 });
+
+    if (step.note) {
+      doc.moveDown(0.15);
+      doc
+        .font('Helvetica')
+        .fontSize(8)
+        .fillColor('#8a897e')
+        .text(step.note, MARGIN + 215, doc.y, { width: CONTENT_WIDTH - 215, lineGap: 1.4 });
+    }
+    doc.moveDown(0.55);
+  }
+
+  doc.moveDown(0.4);
+  doc.moveTo(MARGIN, doc.y).lineTo(PAGE_WIDTH - MARGIN, doc.y).lineWidth(0.5).strokeColor('#e2dfd3').stroke();
+  doc.moveDown(0.6);
+
+  body(
+    doc,
+    `Zinsreihe: ${compute.dataSource.id}, Stand ${compute.dataSource.asOf}. Rechner: ${compute.calculatorId}. Gerechnet am ${formatDate(compute.computedAt)}.`,
+    { size: 8.5, color: '#8a897e' },
+  );
+
+  if (!compute.dataSource.verified) {
+    doc.moveDown(0.3);
+    body(
+      doc,
+      'Hinweis: Die verwendete Zinsreihe ist im System nicht als geprüft markiert. Dieser Bericht ist damit nicht für den Livebetrieb bestimmt.',
+      { size: 8.5, color: '#9a2b1f' },
+    );
+  }
+}
+
 function sectionMethod(doc: Doc, result: AnalysisResult, niche: NicheConfig): void {
   heading(doc, 'Wie geprüft wurde');
   body(
@@ -341,6 +439,7 @@ const RENDERERS: Record<ReportSection, (doc: Doc, result: AnalysisResult, niche:
   findings: (d, r) => sectionFindings(d, r),
   actions: (d, r) => sectionActions(d, r),
   euro: (d, r) => sectionEuro(d, r),
+  calculation: (d, r) => sectionCalculation(d, r),
   letter: (d, r, n) => sectionLetter(d, r, n),
   checklist: (d, r) => sectionChecklist(d, r),
   method: (d, r, n) => sectionMethod(d, r, n),
