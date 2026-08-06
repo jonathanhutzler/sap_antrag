@@ -160,6 +160,8 @@ nachvollziehbar bleibt, welche Fassung wann galt.
 ## Setup
 
 ```bash
+git clone <repo-url>
+cd pruefengine
 npm install
 cp .env.example .env.local     # Werte NUR hier eintragen, nie in .env.example
 npm run dev
@@ -206,8 +208,8 @@ npm run check          # typecheck + Nischen-Prüfung + beide Rauchtests
 
 ## Deployment auf Vercel
 
-1. **Projekt anlegen.** Repository verbinden. **Root Directory** auf
-   `pruefengine` setzen — dieses Verzeichnis, nicht das Repository-Wurzelverzeichnis.
+1. **Projekt anlegen.** Repository verbinden. Das Repository-Wurzelverzeichnis
+   ist zugleich das Projektverzeichnis — **Root Directory** bleibt leer.
 2. **Framework**: Next.js. Build- und Install-Kommandos bleiben Standard.
 3. **Umgebungsvariablen** aus der Tabelle oben unter *Settings → Environment
    Variables* eintragen, für Production **und** Preview. Nach jeder Änderung
