@@ -1,47 +1,45 @@
 ---
 title: Handwerkerrechnung höher als erwartet — die ersten Schritte
-description: Bevor Sie überweisen oder die Zahlung zurückhalten: fünf Dinge, die Sie an der Rechnung selbst prüfen können, und was Sie danach schreiben.
+description: Fünf Dinge, die Sie selbst an der Rechnung prüfen können, bevor Sie überweisen oder die Zahlung zurückhalten. Plus der Text für die Rückfrage.
 date: 2026-07-08
 related: [handwerkerrechnung-pruefen-lassen, stundensatz-handwerker, kostenvoranschlag-ueberschritten]
 ---
 
-Die Rechnung ist da und liegt deutlich über dem, womit Sie gerechnet haben. Der Impuls, sofort anzurufen, ist verständlich — hilft aber wenig, solange Sie nicht sagen können, welche Position Sie meinen. Die folgenden fünf Schritte lassen sich in einer halben Stunde am Küchentisch erledigen.
+Die Rechnung ist da und liegt weit über dem, womit Sie gerechnet haben. Der Impuls, sofort anzurufen, ist verständlich. Er hilft nur wenig, solange Sie nicht sagen können, welche Position Sie meinen. Die folgenden fünf Schritte schaffen Sie in einer halben Stunde am Küchentisch.
 
-## 1. Rechnen Sie die Positionen zusammen
+## 1. Zusammenrechnen
 
-Klingt banal, lohnt sich aber. Addieren Sie die Einzelpositionen und vergleichen Sie das Ergebnis mit dem ausgewiesenen Nettobetrag. Danach den Steuerbetrag: 19 Prozent vom Netto, kaufmännisch gerundet. Und schließlich die Bruttosumme.
+Klingt banal, lohnt sich trotzdem. Addieren Sie die Einzelpositionen und vergleichen Sie das Ergebnis mit dem Nettobetrag. Dann den Steuerbetrag: 19 Prozent vom Netto, kaufmännisch gerundet. Dann die Bruttosumme.
 
-Weicht etwas ab, notieren Sie den genauen Differenzbetrag. Eine Nachfrage mit Betrag beantwortet sich anders als eine Nachfrage ohne.
+Weicht etwas ab, notieren Sie den genauen Differenzbetrag. Eine Nachfrage mit Zahl wird anders beantwortet als eine ohne.
 
-## 2. Halten Sie die Stunden gegen den Kalender
+## 2. Stunden gegen den Kalender halten
 
-Bei Abrechnung nach Aufwand sollte die Rechnung erkennen lassen, an welchen Tagen wie viele Monteure wie lange da waren. Steht nur eine Gesamtstundenzahl, fehlt Ihnen die Grundlage, das nachzuvollziehen — und dem Betrieb im Streitfall die Grundlage, es zu belegen. Die Darlegungslast für den abgerechneten Aufwand liegt beim Werkunternehmer.
+Bei Abrechnung nach Aufwand sollte auf der Rechnung stehen, an welchen Tagen wie viele Monteure wie lange da waren. Steht dort nur eine Gesamtstundenzahl, können Sie nichts nachvollziehen. Und der Betrieb im Streitfall nichts belegen: Die Darlegungslast für den abgerechneten Aufwand liegt bei ihm.
 
-Vergleichen Sie die Zahl mit dem, was Sie erinnern. Wenn zwei Monteure einen halben Tag da waren, sind acht bis neun Stunden plausibel, sechzehn nicht ohne Erklärung.
+Halten Sie die Zahl gegen Ihre Erinnerung. Zwei Monteure, ein halber Tag, das sind acht bis neun Stunden. Sechzehn brauchen eine Erklärung.
 
-## 3. Prüfen Sie den Stundensatz gegen das übliche Band
+## 3. Stundensatz gegen die übliche Spanne
 
-Für Monteurstunden im Bau- und Ausbaugewerbe liegt ein üblicher Rahmen bei etwa 55 bis 95 Euro netto, regional unterschiedlich und je nach Gewerk verschieden. Das ist ein Orientierungswert aus der Branchenkalkulation, keine amtliche Größe und keine Obergrenze.
+Für Monteurstunden im Bau- und Ausbaugewerbe liegt der übliche Rahmen bei etwa 55 bis 95 Euro netto. Regional verschieden, je nach Gewerk verschieden. Das ist ein Orientierungswert aus der Branchenkalkulation, keine amtliche Größe und keine Obergrenze.
 
-Liegt der Satz darüber, ist das kein Vorwurf — es ist eine Nachfrage wert. Ausschlaggebend ist ohnehin, was vereinbart war. War nichts vereinbart, gilt nach § 632 Abs. 2 BGB die übliche Vergütung, und genau darüber lässt sich dann reden.
+Liegt der Satz darüber, ist das kein Vorwurf. Es ist eine Nachfrage wert. Entscheidend ist ohnehin, was vereinbart war. War nichts vereinbart, gilt nach § 632 Abs. 2 BGB die übliche Vergütung, und genau darüber lässt sich dann reden.
 
 Mehr dazu: [Was eine Handwerkerstunde kostet](/handwerkerrechnung/ratgeber/stundensatz-handwerker).
 
-## 4. Suchen Sie nach Positionen, die zweimal auftauchen
+## 4. Nach Doppelungen suchen
 
-Der häufigste Fall: Eine Leistung steht als Einzelposition in der Liste und noch einmal in einer Pauschale weiter unten. Der zweithäufigste: Anfahrten. Zwei Anfahrten sind bei zwei Einsatztagen selbstverständlich, bei einem nicht.
+Häufigster Fall: Eine Leistung steht als Einzelposition in der Liste und noch einmal in einer Pauschale weiter unten. Zweithäufigster: Anfahrten. Zwei bei zwei Einsatztagen sind selbstverständlich, zwei bei einem nicht. Dritter Fall: Kleinmaterial pauschal, und dieselben Kleinteile noch einmal einzeln.
 
-Der dritte Fall betrifft Material: Kleinmaterial pauschal *und* dieselben Kleinteile einzeln aufgeführt.
+## 5. Nach den Arbeitskosten schauen
 
-## 5. Schauen Sie nach den Arbeitskosten
-
-Das ist der Punkt, der am häufigsten Geld kostet und am seltensten auffällt. Die Steuerermäßigung nach § 35a EStG — 20 Prozent der Arbeitskosten, bis zu 1.200 Euro im Jahr — setzt voraus, dass Arbeits-, Maschinen- und Fahrtkosten getrennt von den Materialkosten ausgewiesen sind. Steht auf der Rechnung nur eine Gesamtsumme, geht der Abzug verloren.
+Der Punkt, der am häufigsten Geld kostet und am seltensten auffällt. Die Steuerermäßigung nach § 35a EStG bringt 20 Prozent der Arbeitskosten, bis zu 1.200 Euro im Jahr. Voraussetzung: Arbeits-, Maschinen- und Fahrtkosten müssen getrennt von den Materialkosten ausgewiesen sein. Steht auf der Rechnung nur eine Gesamtsumme, ist der Abzug weg.
 
 Eine korrigierte Rechnung kostet den Betrieb zehn Minuten. Details: [Arbeitskosten nicht getrennt ausgewiesen](/handwerkerrechnung/ratgeber/arbeitskosten-getrennt-ausweisen).
 
 ## Was Sie danach schreiben
 
-Sammeln Sie Ihre Punkte in einer Mail. Sachlich, nummeriert, jede Nachfrage mit der Positionsnummer. Ein Muster:
+Sammeln Sie Ihre Punkte in einer Mail. Sachlich, nummeriert, jede Nachfrage mit Positionsnummer:
 
 > Sehr geehrte Damen und Herren,
 >
@@ -53,16 +51,16 @@ Sammeln Sie Ihre Punkte in einer Mail. Sachlich, nummeriert, jede Nachfrage mit 
 >
 > Sobald die Punkte geklärt sind, überweise ich den dann offenen Betrag umgehend.
 
-Der letzte Satz ist wichtig. Er macht deutlich, dass Sie zahlen wollen und nicht auf Zeit spielen.
+Der letzte Satz ist der wichtigste. Er zeigt, dass Sie zahlen wollen und nicht auf Zeit spielen.
 
-## Was Sie besser nicht tun
+## Drei Dinge, die Sie sich sparen sollten
 
-**Nicht kommentarlos die Zahlung einstellen.** Ob und in welcher Höhe Sie zurückbehalten dürfen, hängt vom Vertrag und vom Einzelfall ab. Das ist eine rechtliche Frage, und sie gehört zu einer Anwältin oder einem Anwalt, nicht in einen Ratgeber.
+**Die Zahlung kommentarlos einstellen.** Ob und in welcher Höhe Sie zurückbehalten dürfen, hängt vom Vertrag und vom Einzelfall ab. Das ist eine Rechtsfrage für einen Anwalt, nicht für einen Ratgeber.
 
-**Nicht kommentarlos überweisen, wenn Punkte offen sind.** Eine bezahlte Rechnung lässt sich zwar weiterhin beanstanden, das Gespräch wird danach aber erfahrungsgemäß zäher.
+**Kommentarlos überweisen, obwohl Punkte offen sind.** Eine bezahlte Rechnung können Sie zwar weiterhin beanstanden. Das Gespräch wird danach erfahrungsgemäß zäher.
 
-**Nicht in Verdächtigungen abrutschen.** Sachliche Nachfragen mit Positionsnummer werden beantwortet. Vorwürfe führen zu Verteidigung.
+**In Verdächtigungen abrutschen.** Sachliche Nachfragen mit Positionsnummer werden beantwortet. Vorwürfe führen zu Verteidigung.
 
 ## Wenn Sie es nicht selbst machen wollen
 
-Genau dafür gibt es unsere Prüfung: Rechnung hochladen, Abgleich gegen [33 veröffentlichte Prüfpunkte](/handwerkerrechnung/pruefkatalog), kostenlose Vorschau. Sie sehen sofort, ob überhaupt etwas zu besprechen ist.
+Dafür gibt es unsere Prüfung: Rechnung hochladen, Abgleich gegen [33 veröffentlichte Punkte](/handwerkerrechnung/pruefkatalog), kostenlose Vorschau. Sie sehen sofort, ob es überhaupt etwas zu besprechen gibt.

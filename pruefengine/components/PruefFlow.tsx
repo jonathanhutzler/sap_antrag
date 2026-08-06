@@ -289,7 +289,7 @@ export function PruefFlow({ config }: { config: FlowConfig }) {
         </button>
 
         <p className="mt-3 font-sans text-xs leading-relaxed text-ink-faint">
-          Die Vorschau kostet nichts. Ihr Dokument wird nach {config.retentionHours} Stunden automatisch gelöscht.
+          Die Vorschau kostet nichts. Ihre Datei löscht das System nach {Math.round(config.retentionHours / 24)} Tagen.
         </p>
 
         {error && (
@@ -307,9 +307,9 @@ export function PruefFlow({ config }: { config: FlowConfig }) {
             <h2 className="mt-2 text-display-md">Was Sie danach kostenlos sehen</h2>
             <ul className="mt-5 space-y-2.5 font-sans text-[0.95rem] leading-relaxed text-ink-muted">
               {[
-                'Wie viele Abweichungen gefunden wurden, aufgeteilt nach Schweregrad',
-                'Welche Kategorien des Prüfkatalogs betroffen sind, namentlich',
-                'Eine vollständig ausformulierte Feststellung mit Fundstelle und Grundlage',
+                'Wie viele Funde es gibt, aufgeteilt nach Schweregrad',
+                'Welche Kategorien des Katalogs betroffen sind, mit Namen',
+                'Einen Fund komplett ausformuliert, mit Fundstelle und Grundlage',
               ].map((item) => (
                 <li key={item} className="flex gap-3">
                   <span className="mt-[0.55em] h-1 w-1 shrink-0 rounded-full bg-accent" aria-hidden />
@@ -318,8 +318,8 @@ export function PruefFlow({ config }: { config: FlowConfig }) {
               ))}
             </ul>
             <p className="mt-5 font-sans text-[0.95rem] leading-relaxed text-ink-faint">
-              Im Vollbericht stehen alle weiteren Feststellungen, die geschätzten Beträge und zu jedem Fund ein Satz,
-              den Sie schreiben oder sagen können.
+              Im Vollbericht stehen die übrigen Funde, die geschätzten Beträge und zu jedem ein Satz zum Schreiben oder
+              Sagen.
             </p>
           </div>
         )}
@@ -331,8 +331,8 @@ export function PruefFlow({ config }: { config: FlowConfig }) {
             <h2 className="mt-2 text-display-md">Nicht beurteilbar</h2>
             <p className="mt-4 font-sans leading-relaxed text-ink-muted">{preview.reason}</p>
             <p className="mt-5 font-sans text-[0.95rem] leading-relaxed text-ink">
-              Es gibt deshalb nichts zu kaufen. Laden Sie das Dokument gern erneut hoch — als PDF aus dem
-              Original oder als gut lesbares Foto der vollständigen Seite.
+              Zu kaufen gibt es hier nichts. Versuchen Sie es gern noch einmal: als PDF aus dem Original oder als Foto,
+              auf dem die ganze Seite scharf ist.
             </p>
           </div>
         )}
@@ -342,11 +342,11 @@ export function PruefFlow({ config }: { config: FlowConfig }) {
             <p className="eyebrow">Ergebnis</p>
             <h2 className="mt-2 text-display-md">Keine Abweichung gefunden</h2>
             <p className="mt-4 font-sans leading-relaxed text-ink-muted">
-              Wir haben {preview.checkedCount} von {config.catalogueSize} Prüfpunkten an Ihrem Dokument prüfen können
-              und dabei nichts gefunden, das wir feststellen würden.
+              Wir konnten {preview.checkedCount} von {config.catalogueSize} Punkten an Ihrem Dokument prüfen. Nichts
+              davon hat angeschlagen.
             </p>
             <p className="mt-4 font-sans text-[0.95rem] leading-relaxed text-ink">
-              Ein Bericht hätte für Sie keinen Inhalt. Deshalb bieten wir ihn nicht an.
+              Ein Bericht wäre leer. Deshalb bieten wir ihn nicht an.
             </p>
           </div>
         )}
@@ -444,8 +444,7 @@ export function PruefFlow({ config }: { config: FlowConfig }) {
                     : `${preview.hiddenFindings} weitere Feststellungen im Bericht`}
                 </h3>
                 <p className="mt-3 font-sans text-[0.95rem] leading-relaxed text-ink-muted">
-                  Dazu die geschätzten Beträge je Feststellung und in der Summe sowie zu jedem Fund genau einen Satz,
-                  den Sie schreiben oder sagen können.
+                  Dazu die geschätzten Beträge, einzeln und zusammen, und zu jedem Fund ein Satz zum Schreiben oder Sagen.
                 </p>
 
                 <div className="mt-6 space-y-3">
@@ -492,7 +491,7 @@ export function PruefFlow({ config }: { config: FlowConfig }) {
                     className="field"
                   />
                   <p className="mt-1.5 font-sans text-xs text-ink-faint">
-                    Ohne Angabe können Sie den Bericht direkt nach der Zahlung herunterladen.
+                    Ohne Angabe laden Sie den Bericht direkt nach der Zahlung herunter.
                   </p>
                 </div>
 

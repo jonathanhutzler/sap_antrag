@@ -72,8 +72,8 @@ export function Fristrechner489() {
         className="field max-w-xs"
       />
       <p className="mt-1.5 font-sans text-xs text-ink-faint">
-        Der Tag, an dem die Darlehenssumme vollständig ausgezahlt war — nicht der Tag des Vertragsschlusses. Bei
-        Auszahlung in Raten zählt die letzte Rate.
+        Der Tag, an dem das Geld vollständig auf Ihrem Konto war. Nicht der Tag der Unterschrift. Kam es in Raten,
+        zählt die letzte.
       </p>
 
       {ergebnis && (
@@ -83,7 +83,7 @@ export function Fristrechner489() {
               <dt className="font-sans text-sm text-ink-faint">Kündigung möglich ab</dt>
               <dd className="mt-0.5 font-display text-2xl text-ink">{formatDe(ergebnis.kuendigungAb)}</dd>
               <dd className="mt-1 font-sans text-sm text-ink-muted">
-                Zehn Jahre nach vollständigem Empfang.{' '}
+                Zehn Jahre nach der Vollauszahlung.{' '}
                 {ergebnis.tageBisKuendigung > 0
                   ? `Noch ${ergebnis.tageBisKuendigung.toLocaleString('de-DE')} Tage.`
                   : 'Dieser Zeitpunkt ist erreicht.'}
@@ -96,26 +96,25 @@ export function Fristrechner489() {
               </dt>
               <dd className="mt-0.5 font-display text-2xl text-accent-ink">{formatDe(ergebnis.wirksamAb)}</dd>
               <dd className="mt-1 font-sans text-sm text-ink-muted">
-                Nach Ablauf der sechsmonatigen Kündigungsfrist.{' '}
+                Nach Ablauf der sechs Monate Kündigungsfrist.{' '}
                 {ergebnis.tageBisWirksam > 0
                   ? `Noch ${ergebnis.tageBisWirksam.toLocaleString('de-DE')} Tage.`
-                  : 'Dieser Zeitpunkt ist erreicht — eine Vorfälligkeitsentschädigung fällt dafür nicht mehr an.'}
+                  : 'Dieser Zeitpunkt ist durch. Eine Vorfälligkeitsentschädigung fällt dafür nicht mehr an.'}
               </dd>
             </div>
           </dl>
 
           {ergebnis.tageBisWirksam > 0 && ergebnis.tageBisWirksam < 400 && (
             <p className="mt-6 rounded-card border border-accent bg-accent-soft p-4 font-sans text-[0.93rem] leading-relaxed text-ink">
-              Der Termin liegt in weniger als einem Jahr. In dieser Lage kann Abwarten günstiger sein als jede
-              Verhandlung über die Höhe einer Entschädigung — vorausgesetzt, Ihr Vorhaben verträgt den Aufschub.
+              Der Termin liegt in weniger als einem Jahr. Abwarten kann dann billiger sein als jede Verhandlung über
+              die Höhe. Vorausgesetzt, Ihr Vorhaben verträgt den Aufschub.
             </p>
           )}
 
           <p className="mt-6 font-sans text-xs leading-relaxed text-ink-faint">
-            Grundlage ist § 489 Abs. 1 Nr. 2 BGB: Ein Darlehen mit gebundenem Sollzinssatz kann der Darlehensnehmer
-            nach Ablauf von zehn Jahren nach vollständigem Empfang mit einer Frist von sechs Monaten kündigen. Die
-            Berechnung findet in Ihrem Browser statt; es wird nichts übertragen und nichts gespeichert. Sie ersetzt
-            keine rechtliche Prüfung Ihres Vertrags.
+            Grundlage ist § 489 Abs. 1 Nr. 2 BGB. Danach kann ein Darlehen mit festem Sollzinssatz zehn Jahre nach
+            der Vollauszahlung mit sechsmonatiger Frist gekündigt werden. Gerechnet wird in Ihrem Browser, es geht
+            nichts an uns und nichts wird gespeichert. Eine rechtliche Prüfung Ihres Vertrags ersetzt das nicht.
           </p>
         </div>
       )}

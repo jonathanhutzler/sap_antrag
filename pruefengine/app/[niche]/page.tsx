@@ -85,19 +85,19 @@ export default function NicheLandingPage({ params }: { params: { niche: string }
           {[
             {
               h: 'Hochladen',
-              p: `${niche.input.docLabel} als ${niche.input.accept.map((a) => a.toUpperCase()).join(', ')}, bis zu ${niche.input.maxPages} Seiten. Dazu ein paar Angaben zum Vorgang.`,
+              p: `${niche.input.docLabel} als ${niche.input.accept.map((a) => a.toUpperCase()).join(', ')}, bis zu ${niche.input.maxPages} Seiten. Dazu ein paar Angaben zum Fall.`,
             },
             {
               h: 'Prüfen',
-              p: `Abgleich gegen ${niche.catalogue.checks.length} Prüfpunkte des Katalogs ${niche.catalogue.version}. Dauert in der Regel unter einer Minute.`,
+              p: `${niche.catalogue.checks.length} Punkte aus Katalog ${niche.catalogue.version}, einer nach dem anderen. Dauert meist unter einer Minute.`,
             },
             {
               h: 'Vorschau',
-              p: 'Kostenlos: Anzahl und Schwere der Funde, betroffene Kategorien, eine ausformulierte Feststellung.',
+              p: 'Kostenlos: wie viele Funde, wie schwer, welche Kategorien. Dazu einer davon komplett ausformuliert.',
             },
             {
               h: 'Vollbericht',
-              p: 'Nach der Zahlung sofort als PDF und per E-Mail, mit allen Feststellungen und Ihren Sätzen zum Mitnehmen.',
+              p: 'Direkt nach der Zahlung als PDF und per E-Mail. Mit allen Funden und Ihren Sätzen zum Mitnehmen.',
             },
           ].map((step, i) => (
             <li key={step.h} className="bg-paper-raised p-6">
@@ -112,10 +112,10 @@ export default function NicheLandingPage({ params }: { params: { niche: string }
       {/* Preise */}
       <section className="mt-20">
         <p className="eyebrow">Preise</p>
-        <h2 className="mt-3 text-display-lg">Bezahlt wird erst, wenn etwas gefunden wurde</h2>
+        <h2 className="mt-3 text-display-lg">Sie zahlen erst, wenn wir etwas gefunden haben</h2>
         <p className="mt-4 max-w-prose text-ink-muted">
-          Die Vorschau ist kostenlos und zeigt Ihnen, ob sich der Bericht lohnt. Ist das Dokument nicht prüfbar oder
-          gibt es nichts zu beanstanden, bieten wir Ihnen den Kauf gar nicht erst an.
+          Die Vorschau kostet nichts und zeigt Ihnen, ob sich der Bericht lohnt. Können wir das Dokument nicht
+          lesen oder finden wir nichts, bieten wir Ihnen auch nichts an.
         </p>
 
         <div className="mt-8 grid gap-5 sm:grid-cols-2">
@@ -171,7 +171,7 @@ export default function NicheLandingPage({ params }: { params: { niche: string }
           <div className="max-w-prose">
             <h2 className="text-display-md">Der Prüfkatalog ist öffentlich</h2>
             <p className="mt-2 font-sans text-[0.97rem] leading-relaxed text-ink-muted">
-              {niche.catalogue.checks.length} Prüfpunkte, jeder mit Grundlage und Schweregrad, in der Version{' '}
+              {niche.catalogue.checks.length} Punkte, jeder mit Grundlage und Schweregrad, Version{' '}
               {niche.catalogue.version}. Lesen Sie ihn, bevor Sie etwas hochladen.
             </p>
           </div>
@@ -199,7 +199,7 @@ export default function NicheLandingPage({ params }: { params: { niche: string }
       {articles.length > 0 && (
         <section className="mt-20">
           <p className="eyebrow">Zum Weiterlesen</p>
-          <h2 className="mt-3 text-display-lg">Was bei {niche.input.docLabel}en häufig gefragt wird</h2>
+          <h2 className="mt-3 text-display-lg">Häufige Fragen zu {niche.input.docLabel}en</h2>
           <ul className="mt-8 divide-y divide-rule border-y border-rule">
             {articles.map((article) => (
               <li key={article.slug} className="py-5">
@@ -224,7 +224,7 @@ export default function NicheLandingPage({ params }: { params: { niche: string }
       <section className="mt-20">
         <div className="sheet flex flex-wrap items-center justify-between gap-6 p-8">
           <p className="max-w-prose font-display text-xl">
-            {niche.input.docLabel} hochladen, Vorschau in unter einer Minute.
+            Hochladen, unter einer Minute warten, Vorschau lesen.
           </p>
           <Link href={`/${niche.slug}/pruefung`} className="btn-primary">
             Jetzt prüfen

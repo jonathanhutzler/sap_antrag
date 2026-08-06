@@ -34,15 +34,15 @@ export default function RatgeberPage({ params }: { params: { niche: string } }) 
     <>
       <section className="pt-14 sm:pt-20">
         <p className="eyebrow">Ratgeber · {niche.brand.name}</p>
-        <h1 className="mt-3 max-w-[22ch] text-display-xl">Was bei {niche.input.docLabel}en zählt</h1>
+        <h1 className="mt-3 max-w-[22ch] text-display-xl">Worauf es bei {niche.input.docLabel}en ankommt</h1>
         <p className="mt-5 max-w-prose text-[1.06rem] leading-[1.62] text-ink-muted">
-          Beiträge zu den Punkten, die im Prüfkatalog stehen — ausführlicher, als es in einen Bericht passt. Jeder
-          Beitrag nennt seine Grundlage und bleibt bei dem, was sich belegen lässt.
+          Zu den Punkten aus dem Prüfkatalog, ausführlicher als es in einen Bericht passt. Jeder Beitrag nennt seine
+          Grundlage und bleibt bei dem, was sich belegen lässt.
         </p>
       </section>
 
       {articles.length === 0 ? (
-        <p className="mt-16 text-ink-muted">Für diese Prüfung sind noch keine Beiträge veröffentlicht.</p>
+        <p className="mt-16 text-ink-muted">Für diese Prüfung gibt es noch keine Beiträge.</p>
       ) : (
         <ul className="mt-14 divide-y divide-rule border-y border-rule">
           {articles.map((article) => (
@@ -64,7 +64,7 @@ export default function RatgeberPage({ params }: { params: { niche: string } }) 
       <section className="mt-16">
         <div className="sheet flex flex-wrap items-center justify-between gap-6 p-8">
           <p className="max-w-prose font-display text-xl">
-            Sie haben eine {niche.input.docLabel} vorliegen? Die Vorschau kostet nichts.
+            {niche.input.docLabel} zur Hand? Die Vorschau kostet nichts.
           </p>
           <Link href={`/${niche.slug}/pruefung`} className="btn-primary">
             Jetzt prüfen

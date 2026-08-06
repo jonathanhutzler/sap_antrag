@@ -21,7 +21,7 @@ export const vorfaelligkeitsentschaedigung: NicheConfig = {
 
   brand: {
     name: 'Vorfälligkeitsentschädigung prüfen',
-    claim: 'Nachgerechnet, nicht geschätzt.',
+    claim: 'Nachgerechnet statt geschätzt.',
     accent: '#2c4a7c',
   },
 
@@ -161,11 +161,11 @@ export const vorfaelligkeitsentschaedigung: NicheConfig = {
         priceCents: 9900,
         stripePriceId: process.env.STRIPE_PRICE_VFE_BASIS || '',
         includes: [
-          'Eigene Nachrechnung nach der Aktiv-Passiv-Methode als Band',
-          'Vollständiger Rechenweg mit allen Eingangswerten und Zwischenschritten',
-          'Alle Feststellungen mit Fundstelle und Grundlage',
-          'Fristen nach § 489 BGB und, falls einschlägig, zur Verjährung',
-          'PDF-Bericht mit Katalogversion, Zinsreihe und Stand',
+          'Die Nachrechnung nach der Aktiv-Passiv-Methode, als Spanne',
+          'Der komplette Rechenweg mit allen Eingangswerten',
+          'Jede Feststellung mit Fundstelle und Grundlage',
+          'Ihre Fristen nach § 489 BGB, bei Bedarf auch zur Verjährung',
+          'PDF mit Katalogversion, Zinsreihe und deren Stand',
         ],
       },
       {
@@ -175,8 +175,8 @@ export const vorfaelligkeitsentschaedigung: NicheConfig = {
         stripePriceId: process.env.STRIPE_PRICE_VFE_PLUS || '',
         includes: [
           'Alles aus der Nachrechnung',
-          'Nachfrage- und Einwendungsschreiben an die Bank mit Bitte um Offenlegung der Berechnungsgrundlagen',
-          'Positionsliste zum Abhaken für das Gespräch',
+          'Fertiges Schreiben an die Bank, das die Berechnungsgrundlagen anfordert',
+          'Positionsliste zum Abhaken fürs Gespräch',
         ],
         sections: [
           'summary',
@@ -239,58 +239,58 @@ export const vorfaelligkeitsentschaedigung: NicheConfig = {
     {
       id: 'fristrechner-489',
       slug: 'fristrechner',
-      title: 'Wann können Sie ohne Vorfälligkeitsentschädigung kündigen?',
+      title: 'Wann kommen Sie ohne Vorfälligkeitsentschädigung raus?',
       intro:
-        'Nach § 489 Abs. 1 Nr. 2 BGB können Sie ein Darlehen zehn Jahre nach vollständigem Empfang mit einer Frist von sechs Monaten kündigen — ohne Entschädigung. Tragen Sie das Datum der Vollauszahlung ein, dann rechnen wir Ihnen den Termin aus. Kostenlos, ohne Upload, ohne Anmeldung.',
-      cta: 'Wenn Sie vorher ablösen und die Bank eine Entschädigung fordert: Wir rechnen die Forderung nach.',
+        'Zehn Jahre nach der Vollauszahlung dürfen Sie kündigen, mit sechs Monaten Frist, ohne Entschädigung. So steht es in § 489 Abs. 1 Nr. 2 BGB. Tragen Sie das Datum ein, wir rechnen den Termin aus. Kostenlos, ohne Upload, ohne Anmeldung.',
+      cta: 'Sie wollen vorher raus und die Bank verlangt eine Entschädigung? Die rechnen wir Ihnen nach.',
     },
   ],
 
   landing: {
     h1: 'Vorfälligkeitsentschädigung nachrechnen lassen',
     subline:
-      'Ihre Bank fordert eine Entschädigung für die vorzeitige Ablösung. Wir rechnen sie nach — nach der Aktiv-Passiv-Methode, mit laufzeitkongruenter Abzinsung, in geprüftem Programmcode statt per Schätzung. Sie bekommen ein Band, den vollständigen Rechenweg und die Fragen an Ihre Bank.',
+      'Ihre Bank will Geld dafür, dass Sie früher aussteigen. Wir rechnen den Betrag nach: Aktiv-Passiv-Methode, laufzeitkongruent abgezinst, in getestetem Programmcode. Sie bekommen eine Spanne, den kompletten Rechenweg und die Fragen, die Sie Ihrer Bank stellen können.',
     proofPoints: [
-      'Gerechnet wird im Code, nicht von einem Sprachmodell. Das Modell liest nur die Parameter ab.',
-      'Ergebnis als Band, nicht als Punktwert — die ersparten Kosten sind Schätzgrößen, und das sagen wir auch.',
-      'Nicht ausgeübte Sondertilgungsrechte werden angesetzt. Rechnerisch der größte und häufigste Fehler.',
-      'Der Berechnungszeitraum endet am Kündigungstermin nach § 489 BGB, wenn einer in der Restlaufzeit liegt.',
-      'Fehlt ein Pflichtwert in Ihren Unterlagen, sagen wir das — und bieten Ihnen den Bericht gar nicht erst an.',
+      'Gerechnet wird im Code. Das Sprachmodell liest nur die Werte aus Ihren Unterlagen ab.',
+      'Das Ergebnis ist eine Spanne. Zwei Posten der Rechnung sind Schätzgrößen, und dann ist ein Betrag auf den Euro genau geflunkert.',
+      'Nicht genutzte Sondertilgungsrechte werden angesetzt. Das ist der Fehler, der am häufigsten vorkommt und am meisten ausmacht.',
+      'Liegt Ihr Kündigungstermin nach § 489 BGB innerhalb der Restlaufzeit, endet unsere Rechnung dort.',
+      'Fehlt ein Pflichtwert in Ihren Unterlagen, sagen wir das. Geschätzt wird hier nichts.',
     ],
     competitorAnchor:
-      'Die Verbraucherzentrale Hamburg überprüft eine Vorfälligkeitsentschädigung für 125 Euro je Kreditvertrag und braucht dafür bis zu zwei Wochen. Das ist eine seriöse und gründliche Anlaufstelle. Wir sind die schnelle Variante: dasselbe Rechenverfahren, Ergebnis in wenigen Minuten.',
+      'Die Verbraucherzentrale Hamburg prüft eine Vorfälligkeitsentschädigung für 125 Euro je Kreditvertrag und braucht dafür bis zu zwei Wochen. Gute Adresse, gründliche Arbeit. Wir rechnen dasselbe Verfahren, nur schneller.',
     faq: [
       {
         q: 'Rechnet hier eine KI meine Entschädigung aus?',
-        a: 'Nein, und das ist der Kern des Produkts. Ein Sprachmodell liest ausschließlich die Parameter aus Ihren Unterlagen ab — Restschuld, Zinssatz, Zinsbindung, Sondertilgungsrechte. Gerechnet wird danach in Programmcode, der getestet ist und bei gleichen Eingaben immer dasselbe Ergebnis liefert. Eine ausgedachte Barwertberechnung wäre bei diesen Beträgen kein Schönheitsfehler.',
+        a: 'Nein. Ein Sprachmodell liest die Werte aus Ihren Unterlagen ab: Restschuld, Zinssatz, Zinsbindung, Sondertilgungsrechte. Das war seine ganze Aufgabe. Gerechnet wird danach in Programmcode, der getestet ist und bei gleichen Eingaben immer dasselbe Ergebnis liefert. Eine erfundene Barwertrechnung sähe genauso überzeugend aus wie eine richtige, und dafür geht es hier um zu viel Geld.',
       },
       {
-        q: 'Warum bekomme ich ein Band und keine Zahl?',
-        a: 'Weil zwei Bestandteile der Rechnung Schätzgrößen sind: die ersparten Verwaltungskosten und die ersparten Risikokosten. Wer daraus einen Betrag auf den Euro genau macht, tut nur so, als wäre er sicher. Wir nennen die Spanne und sagen dazu, worauf sie beruht.',
+        q: 'Warum eine Spanne und keine Zahl?',
+        a: 'Zwei Posten der Rechnung lassen sich nicht exakt bestimmen: die ersparten Verwaltungskosten und die ersparten Risikokosten. Wer daraus einen Betrag auf den Euro genau macht, tut nur so, als wüsste er es. Wir nennen die Spanne und schreiben dazu, welche Werte wir angesetzt haben.',
       },
       {
         q: 'Was ist die Aktiv-Passiv-Methode?',
-        a: 'Die Zahlungen, die die Bank ohne Ihre vorzeitige Ablösung bis zum Ende der Zinsbindung erhalten hätte, werden auf den Ablösestichtag abgezinst — mit dem Zins, den die Bank für eine Wiederanlage gleicher Laufzeit erhalten könnte. Die Differenz zur Restschuld ist der Zinsschaden; davon gehen ersparte Verwaltungs- und Risikokosten ab. Der Bundesgerichtshof hat dieses Verfahren als zulässige Berechnungsmethode anerkannt.',
+        a: 'Man nimmt alle Zahlungen, die Ihre Bank ohne die vorzeitige Ablösung bis zum Ende der Zinsbindung noch bekommen hätte, und rechnet sie auf den Ablösestichtag zurück. Der Zinssatz dafür ist der, den die Bank für eine gleich lange Wiederanlage bekäme. Was über der Restschuld liegt, ist ihr Zinsschaden. Davon gehen ersparte Verwaltungs- und Risikokosten ab. Der Bundesgerichtshof hat das Verfahren anerkannt.',
       },
       {
         q: 'Was ist mit Sondertilgungsrechten?',
-        a: 'Wenn Ihr Vertrag jährliche Sondertilgungen erlaubt, ist bei der Berechnung zu unterstellen, dass Sie sie genutzt hätten — die Bank hätte dann weniger Zinsen bekommen. Wird das übergangen, fällt die Forderung deutlich höher aus. Wir rechnen beide Varianten und nennen die Differenz.',
+        a: 'Erlaubt Ihr Vertrag jährliche Sondertilgungen, muss die Rechnung so tun, als hätten Sie sie genutzt. Die Bank hätte dann weniger Zinsen bekommen. Fällt das unter den Tisch, wird die Forderung deutlich größer. Wir rechnen beide Varianten und schreiben die Differenz hin.',
       },
       {
         q: 'Ist das eine Rechtsberatung?',
-        a: 'Nein. Es ist eine unabhängige rechnerische Überprüfung. Der Bericht rechnet nach und stellt Fragen; er sagt Ihnen nicht, ob Sie zahlen müssen oder ob eine Forderung durchsetzbar ist. Diese Fragen beantwortet eine Fachanwältin oder ein Fachanwalt für Bank- und Kapitalmarktrecht.',
+        a: 'Nein. Wir rechnen nach und stellen Fragen. Ob Sie zahlen müssen und ob sich etwas durchsetzen lässt, beantwortet ein Fachanwalt für Bank- und Kapitalmarktrecht.',
       },
       {
         q: 'Welche Unterlagen brauche ich?',
-        a: 'Die Berechnung der Bank und den Darlehensvertrag, optional den letzten Kontoauszug oder Tilgungsplan. Dazu das Datum der Vollauszahlung und das Ablösedatum. Fehlt einer der Pflichtwerte, sagen wir Ihnen das und bieten keinen Bericht an, statt zu schätzen.',
+        a: 'Die Berechnung der Bank und den Darlehensvertrag. Kontoauszug oder Tilgungsplan helfen, sind aber nicht nötig. Dazu zwei Daten: wann das Darlehen vollständig ausgezahlt war und wann Sie ablösen. Fehlt einer der Pflichtwerte, sagen wir Ihnen das, statt zu schätzen.',
       },
       {
-        q: 'Ich habe schon gezahlt — lohnt sich das noch?',
-        a: 'Möglicherweise. Für Rückforderungen gilt die regelmäßige Verjährung von drei Jahren ab dem Schluss des Jahres, in dem der Anspruch entstanden ist und Sie davon wussten. Der Bericht nennt Ihnen das konkrete Datum als Orientierung und empfiehlt die anwaltliche Klärung. Wählen Sie beim Upload als Anlass „Bereits gezahlt".',
+        q: 'Ich habe schon gezahlt. Lohnt sich das noch?',
+        a: 'Kann sein. Für Rückforderungen gelten drei Jahre, gerechnet ab dem Ende des Jahres, in dem der Anspruch entstanden ist und Sie davon wussten. Der Bericht nennt Ihnen das Datum als Orientierung und rät zur anwaltlichen Klärung. Wählen Sie beim Hochladen als Anlass „Bereits gezahlt".',
       },
       {
-        q: 'Was kann ich mit dem Bericht anfangen?',
-        a: 'Sie können die Berechnungsgrundlagen bei Ihrer Bank anfordern und Ihre Fragen belegt stellen. Im größeren Paket ist ein fertiges Nachfrage- und Einwendungsschreiben enthalten. Und wenn Sie danach zur Anwältin gehen, ist das Gespräch kürzer und konkreter, weil die Zahlen schon auf dem Tisch liegen.',
+        q: 'Was mache ich mit dem Bericht?',
+        a: 'Sie fordern bei Ihrer Bank die Berechnungsgrundlagen an und stellen Ihre Fragen mit Zahlen im Rücken. Im größeren Paket liegt ein fertiges Schreiben dafür bei. Gehen Sie danach zum Anwalt, wird das Gespräch kürzer, weil die Rechnung schon auf dem Tisch liegt.',
       },
     ],
     sample: {
@@ -310,23 +310,23 @@ export const vorfaelligkeitsentschaedigung: NicheConfig = {
           mark: 'A',
           checkId: 'VFE-11',
           severity: 'warn',
-          note: 'Angesetzt sind 1,90 Prozent. Die laufzeitkongruente Referenz liegt zum Ablösestichtag höher. Ein niedriger angesetzter Wiederanlagezins erhöht die Forderung.',
+          note: 'Angesetzt sind 1,90 Prozent. Die Referenz für diese Laufzeit liegt zum Ablösestichtag höher. Je niedriger dieser Satz, desto größer die Forderung.',
         },
         {
           mark: 'B',
           checkId: 'VFE-12',
           severity: 'warn',
-          note: 'Ersparte Verwaltungskosten sind mit null angesetzt. Durch die Ablösung entfällt der Verwaltungsaufwand für gut sechs Jahre Restlaufzeit.',
+          note: 'Hier steht eine Null. Nach der Ablösung muss die Bank das Darlehen gut sechs Jahre lang nicht mehr verwalten.',
         },
         {
           mark: 'C',
           checkId: 'VFE-14',
           severity: 'error',
-          note: 'Der Vertrag erlaubt jährliche Sondertilgungen von 5 Prozent. Bei der Berechnung ist zu unterstellen, dass sie genutzt worden wären.',
+          note: 'Der Vertrag erlaubt 5 Prozent Sondertilgung im Jahr. Die Rechnung muss unterstellen, dass Sie davon Gebrauch gemacht hätten.',
         },
       ],
       caption:
-        'Drei Stellschrauben, drei Prüfpunkte. Was daraus rechnerisch folgt, steht im Bericht — mit vollständigem Rechenweg.',
+        'Drei Stellschrauben, drei Prüfpunkte. Was daraus folgt, steht im Bericht, mitsamt Rechenweg.',
     },
   },
 

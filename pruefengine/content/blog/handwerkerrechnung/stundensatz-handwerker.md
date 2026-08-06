@@ -1,58 +1,56 @@
 ---
-title: Was eine Handwerkerstunde kostet — und was auf der Rechnung stehen sollte
-description: Übliche Bänder für Monteurstunden, warum der Stundensatz allein wenig aussagt und welche Angaben eine Aufwandsabrechnung nachvollziehbar machen.
+title: Was eine Handwerkerstunde kostet und was auf der Rechnung stehen sollte
+description: Übliche Spannen für Monteurstunden, warum der Satz allein wenig aussagt und welche Angaben eine Aufwandsabrechnung nachvollziehbar machen.
 date: 2026-06-17
 related: [handwerkerrechnung-zu-hoch, anfahrtskosten-handwerker, notdienstzuschlag-rechnung]
 ---
 
-„118 Euro die Stunde — ist das normal?" Die Frage lässt sich beantworten, aber nicht mit einer Zahl allein. Drei Dinge gehören dazu: das übliche Band, was vereinbart war, und was die Rechnung überhaupt erkennen lässt.
+„118 Euro die Stunde, ist das normal?" Die Frage lässt sich beantworten, aber nicht mit einer Zahl allein. Drei Dinge gehören dazu: die übliche Spanne, was vereinbart war, und was die Rechnung überhaupt erkennen lässt.
 
-## Das übliche Band
+## Die übliche Spanne
 
-Für Monteurstunden im Bau- und Ausbaugewerbe liegt ein üblicher Rahmen bei etwa **55 bis 95 Euro netto**. Die Spanne ist groß, und sie ist es aus guten Gründen: Region, Gewerk, Qualifikation und Betriebsgröße wirken sich erheblich aus. In Ballungsräumen liegt das Band höher als auf dem Land, Elektro und SHK höher als einfache Ausbaugewerke, Meisterstunden höher als Gesellenstunden.
+Für Monteurstunden im Bau- und Ausbaugewerbe liegt der Rahmen bei etwa **55 bis 95 Euro netto**. Die Spanne ist groß, und dafür gibt es Gründe: Region, Gewerk, Qualifikation, Betriebsgröße. In Ballungsräumen liegt sie höher als auf dem Land. Elektro und SHK höher als einfache Ausbaugewerke. Meisterstunden höher als Gesellenstunden.
 
-Das ist ein Orientierungswert aus der Branchenkalkulation, keine amtliche Größe und keine Obergrenze. Ein Satz darüber ist kein Regelverstoß. Er ist ein Grund, nachzufragen, worauf er sich stützt.
+Orientierungswert aus der Branchenkalkulation, keine amtliche Größe, keine Obergrenze. Ein Satz darüber ist kein Regelverstoß. Er ist ein Grund nachzufragen, worauf er sich stützt.
 
 ## Warum der Satz allein wenig sagt
 
-Ein Stundensatz muss die Vollkosten decken: Bruttolohn, Lohnnebenkosten, Ausfallzeiten, Fahrzeug, Werkzeug, Werkstatt, Verwaltung, Gewährleistungsrückstellungen — und Gewinn. Vom Satz landet ein knappes Drittel beim Monteur.
+Ein Stundensatz muss die Vollkosten decken: Bruttolohn, Lohnnebenkosten, Ausfallzeiten, Fahrzeug, Werkzeug, Werkstatt, Verwaltung, Rückstellungen für Gewährleistung, Gewinn. Beim Monteur landet knapp ein Drittel.
 
-Deshalb ist die interessantere Frage selten „Wie hoch ist der Satz?", sondern:
+Interessanter sind deshalb drei andere Fragen.
 
-- **Wie viele Stunden sind abgerechnet?** Ein moderater Satz auf zu vielen Stunden kostet mehr als ein hoher Satz auf der richtigen Stundenzahl.
-- **Wird die Anfahrt zusätzlich berechnet?** Manche Betriebe kalkulieren sie in den Satz ein, andere stellen sie separat. Beides ist üblich — beides zusammen ist eine Nachfrage wert.
-- **Werden Zuschläge addiert?** Notdienst, Wochenende, Nacht.
+Wie viele Stunden sind abgerechnet? Ein moderater Satz auf zu vielen Stunden kostet mehr als ein hoher Satz auf der richtigen Zahl.
+
+Kommt die Anfahrt obendrauf? Manche Betriebe kalkulieren sie in den Satz ein, andere stellen sie separat. Beides ist üblich. Beides zusammen ist eine Nachfrage wert.
+
+Werden Zuschläge addiert? Notdienst, Wochenende, Nacht.
 
 ## Was war vereinbart?
 
-Der rechtlich entscheidende Punkt. War ein Stundensatz vereinbart — schriftlich, mündlich, im Kostenvoranschlag —, gilt er. War nichts vereinbart, schuldet der Auftraggeber nach § 632 Abs. 2 BGB die **übliche Vergütung**.
+Der rechtlich entscheidende Punkt. War ein Stundensatz vereinbart, schriftlich, mündlich oder im Kostenvoranschlag, dann gilt er. War nichts vereinbart, schulden Sie nach § 632 Abs. 2 BGB die übliche Vergütung.
 
-Genau an dieser Stelle wird das Referenzband praktisch relevant: Bei einer Abrechnung ohne Vereinbarung ist die übliche Vergütung der Maßstab, und was üblich ist, ergibt sich aus dem, was vergleichbare Betriebe in vergleichbarer Lage verlangen.
+Genau hier wird die Spanne praktisch relevant. Ohne Vereinbarung ist das Übliche der Maßstab, und was üblich ist, ergibt sich daraus, was vergleichbare Betriebe in vergleichbarer Lage verlangen.
 
-Ob ein konkreter Satz im Einzelfall noch üblich ist, entscheidet das nicht — das ist eine Frage für eine anwaltliche Einschätzung. Das Band sagt Ihnen nur, ob es sich lohnt, die Frage zu stellen.
+Ob ein konkreter Satz im Einzelfall noch üblich ist, entscheidet das nicht. Das gehört zu einem Anwalt. Die Spanne sagt Ihnen nur, ob sich die Frage lohnt.
 
-## Was eine Aufwandsabrechnung enthalten sollte
+## Was in eine Aufwandsabrechnung gehört
 
-Wird nach Aufwand abgerechnet, ist die Rechnung nur dann nachvollziehbar, wenn erkennbar ist:
+Wird nach Aufwand abgerechnet, sollte erkennbar sein:
 
-- **an welchem Tag** gearbeitet wurde,
-- **wie viele Monteure** anwesend waren,
-- **wie lange** je Einsatz,
-- **welcher Satz** je Personengruppe gilt (Meister, Geselle, Helfer, Azubi).
+- an welchem Tag gearbeitet wurde
+- wie viele Monteure da waren
+- wie lange, je Einsatz
+- welcher Satz für wen gilt: Meister, Geselle, Helfer, Azubi
 
-Steht auf der Rechnung nur „14,5 Std. à 89,00 €", fehlt Ihnen die Möglichkeit, das gegen Ihre eigene Erinnerung zu halten. Die Darlegungslast für den abgerechneten Aufwand liegt beim Werkunternehmer; eine Aufschlüsselung ist deshalb eine berechtigte Bitte, keine Zumutung.
-
-Ein Satz dafür:
+Steht auf der Rechnung nur „14,5 Std. à 89,00 €", können Sie nichts gegen Ihre Erinnerung halten. Die Darlegungslast für den abgerechneten Aufwand liegt beim Betrieb. Eine Aufschlüsselung zu erbitten ist deshalb keine Zumutung.
 
 > Bitte schlüsseln Sie die abgerechneten Stunden nach Einsatztag, Anzahl der Monteure und Dauer auf.
 
-## Nicht mitgerechnete Zeiten
+## Zwei Zeiten, über die man streiten kann
 
-Zwei Punkte, die auf Rechnungen unterschiedlich gehandhabt werden:
+**Materialbeschaffung.** Fährt ein Monteur während des Einsatzes zum Großhändler, ist das Arbeitszeit. Wird die Fahrt zusätzlich als Anfahrt berechnet, steht derselbe Vorgang zweimal auf der Rechnung.
 
-**Materialbeschaffung.** Fährt ein Monteur während des Einsatzes zum Großhändler, ist die Zeit Arbeitszeit. Wird die Fahrt zusätzlich als Anfahrt berechnet, ist derselbe Vorgang zweimal abgerechnet.
-
-**Rüstzeiten.** Auf- und Abbau, Abdecken, Aufräumen gehören zur Leistung. Sie separat als Pauschale zu führen, ist zulässig; sie doppelt zu führen — einmal in der Stundenzahl, einmal als Pauschale — nicht.
+**Rüstzeiten.** Auf- und Abbau, Abdecken, Aufräumen gehören zur Leistung. Sie separat als Pauschale zu führen, ist in Ordnung. Sie doppelt zu führen, einmal in den Stunden und einmal als Pauschale, nicht.
 
 ## Wenn der Satz von der Absprache abweicht
 
@@ -62,4 +60,4 @@ Der klarste Fall: Im Kostenvoranschlag standen 75 Euro, auf der Rechnung stehen 
 
 ## In der Prüfung
 
-Der Stundenverrechnungssatz ist Prüfpunkt HR-15 in unserem [Prüfkatalog](/handwerkerrechnung/pruefkatalog), die Nachvollziehbarkeit der Stunden HR-23, das Verhältnis von Aufwand und beschriebener Leistung HR-24. Der Bericht nennt das Referenzband immer ausdrücklich als Orientierungswert — und beziffert die Differenz zum oberen Bandwert, nicht zu einem Wunschwert.
+Der Stundensatz ist Prüfpunkt HR-15 in unserem [Prüfkatalog](/handwerkerrechnung/pruefkatalog), die Nachvollziehbarkeit der Stunden HR-23, das Verhältnis von Aufwand und beschriebener Leistung HR-24. Der Bericht nennt die Spanne immer ausdrücklich als Orientierungswert und beziffert die Differenz zum oberen Rand, nicht zu einem Wunschwert.

@@ -17,11 +17,11 @@ export const site = {
 
   /** Marke der Dachdomain. Bewusst kein Nischenbegriff. */
   name: 'Prüfstelle',
-  claim: 'Dokumente prüfen, bevor Sie zahlen.',
+  claim: 'Rechnungen prüfen, bevor Sie zahlen.',
 
   /** Das Versprechen des Hubs. Kein Kachel-Verzeichnis, eine eigene Aussage. */
   promise:
-    'Wir prüfen Abrechnungen gegen einen veröffentlichten Prüfkatalog — nicht gegen ein Bauchgefühl. Sie sehen vorab, wonach gesucht wird, und danach, was gefunden wurde.',
+    'Jede Prüfung hat einen Katalog, den Sie vorher lesen können. Darin steht Punkt für Punkt, wonach wir suchen und worauf sich das stützt. Was wir finden, belegen wir mit einem Zitat aus Ihrem Dokument.',
 
   /**
    * Übernommen aus dem Impressum des Bestandsprodukts

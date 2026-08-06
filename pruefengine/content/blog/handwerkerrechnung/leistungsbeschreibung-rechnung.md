@@ -5,17 +5,17 @@ date: 2026-04-29
 related: [pflichtangaben-handwerkerrechnung, handwerkerrechnung-zu-hoch, arbeitskosten-getrennt-ausweisen]
 ---
 
-Es ist die häufigste Feststellung überhaupt: eine Position, aus der nicht hervorgeht, was eigentlich gemacht wurde. „Reparaturarbeiten", „diverse Leistungen", „Material laut Aufstellung". Der Betrag steht daneben, der Inhalt bleibt offen.
+Es ist die häufigste Feststellung überhaupt: eine Position, aus der nicht hervorgeht, was gemacht wurde. „Reparaturarbeiten". „Diverse Leistungen". „Material laut Aufstellung". Der Betrag steht daneben, der Inhalt bleibt offen.
 
 ## Was das Gesetz verlangt
 
-§ 14 Abs. 4 Nr. 5 UStG fordert „die Menge und die Art (handelsübliche Bezeichnung) der gelieferten Gegenstände oder den Umfang und die Art der sonstigen Leistung". Der Maßstab: Ein sachkundiger Dritter soll erkennen können, was geleistet wurde — ohne Rückfrage, allein anhand der Rechnung.
+§ 14 Abs. 4 Nr. 5 UStG fordert „die Menge und die Art (handelsübliche Bezeichnung) der gelieferten Gegenstände oder den Umfang und die Art der sonstigen Leistung". Der Maßstab: Ein sachkundiger Dritter soll erkennen können, was geleistet wurde. Ohne Rückfrage, allein anhand der Rechnung.
 
-Der Sinn ist zunächst steuerlich: Die Finanzverwaltung soll die Leistung identifizieren und einer Lieferung zuordnen können. Für Sie als Privatperson ist der praktische Nutzen ein anderer, aber er ist der wichtigere.
+Der Sinn ist zunächst steuerlich. Die Finanzverwaltung soll die Leistung identifizieren können. Für Sie als Privatperson ist der praktische Nutzen ein anderer, aber der wichtigere.
 
 ## Warum Sie das betrifft, auch ohne Vorsteuerabzug
 
-Als Privatperson ziehen Sie keine Vorsteuer. Trotzdem hängt an der Leistungsbeschreibung einiges:
+Als Privatperson ziehen Sie keine Vorsteuer. An der Leistungsbeschreibung hängt trotzdem einiges.
 
 **Sie können die Rechnung sonst nicht prüfen.** Eine Pauschalposition lässt sich nicht gegen den Kostenvoranschlag halten, nicht gegen den Aufwand, nicht gegen den Materialeinsatz. Sie können sie nur glauben.
 
@@ -25,7 +25,7 @@ Als Privatperson ziehen Sie keine Vorsteuer. Trotzdem hängt an der Leistungsbes
 
 ## Was ausreicht
 
-Ausreichend sind Beschreibungen, die Art und Umfang erkennen lassen:
+Beschreibungen, die Art und Umfang erkennen lassen:
 
 - „Austausch Eckventil Waschtisch Gäste-WC, Fabrikat …, inkl. Abdichten und Dichtheitsprüfung"
 - „Malerarbeiten Treppenhaus, 62 m² Wandfläche, Untergrund gespachtelt, zweimal Dispersion weiß"
@@ -33,7 +33,7 @@ Ausreichend sind Beschreibungen, die Art und Umfang erkennen lassen:
 
 Erkennbar ist jeweils: was, wo, wie viel.
 
-**Nicht ausreichend** sind Formulierungen, die den Umfang offenlassen:
+Das reicht nicht:
 
 - „Reparaturarbeiten laut Auftrag"
 - „diverse Arbeiten"
@@ -41,30 +41,30 @@ Erkennbar ist jeweils: was, wo, wie viel.
 - „Nebenleistungen"
 - „Regiearbeiten"
 
-Ein Grenzfall ist der Verweis auf ein anderes Dokument: „Leistungen gemäß Angebot Nr. 2026-114". Das ist zulässig, wenn das bezeichnete Dokument Ihnen vorliegt und die Leistung dort beschrieben ist. Liegt es Ihnen nicht vor, ist die Rechnung für Sie nicht prüfbar — dann fordern Sie es an.
+Ein Grenzfall ist der Verweis auf ein anderes Dokument: „Leistungen gemäß Angebot Nr. 2026-114". Zulässig, wenn Ihnen das Angebot vorliegt und die Leistung dort beschrieben ist. Liegt es Ihnen nicht vor, ist die Rechnung für Sie nicht prüfbar. Fordern Sie es an.
 
 ## Was Sie schreiben
 
-Die Bitte um Aufschlüsselung ist üblich und wird in aller Regel erfüllt:
+Die Bitte um Aufschlüsselung ist üblich und wird meist erfüllt:
 
 > Bitte schlüsseln Sie Position … („…") nach Art und Umfang der ausgeführten Arbeiten auf, damit ich die Rechnung nachvollziehen kann.
 
-Wenn zusätzlich der getrennte Ausweis fehlt, gleich beides in einem Satz:
+Wenn zusätzlich der getrennte Ausweis fehlt, beides in einem Satz:
 
 > Bitte schlüsseln Sie Position … nach Art und Umfang auf und weisen Sie dabei die Arbeitskosten getrennt von den Materialkosten aus.
 
-Und wenn auf ein Angebot verwiesen wird, das Sie nicht haben:
+Und beim Verweis auf ein Angebot, das Sie nicht haben:
 
 > Die Rechnung verweist auf Angebot Nr. … Bitte senden Sie mir dieses Angebot zu, damit ich die abgerechneten Leistungen nachvollziehen kann.
 
-## Was Sie realistischerweise erwarten können
+## Was realistisch passiert
 
-Eine nachträgliche Aufschlüsselung ist meist eine Sache von Minuten — die Daten liegen im Betrieb vor, sie sind nur nicht auf die Rechnung gewandert. Manche Betriebe schreiben Rechnungen bewusst knapp, weil sie glauben, das erspare Diskussionen. Das Gegenteil ist der Fall.
+Eine nachträgliche Aufschlüsselung ist meist eine Sache von Minuten. Die Daten liegen im Betrieb vor, sie sind nur nicht auf die Rechnung gewandert. Manche Betriebe schreiben knapp, weil sie glauben, das erspare Diskussionen. Es ist umgekehrt.
 
-Reagiert ein Betrieb auf eine sachliche Bitte um Aufschlüsselung gar nicht, ist das für sich genommen eine Information. Was daraus folgt, ist eine rechtliche Frage für eine anwaltliche Einschätzung.
+Reagiert ein Betrieb auf eine sachliche Bitte um Aufschlüsselung gar nicht, ist auch das eine Information. Was daraus folgt, ist eine Rechtsfrage.
 
 ## In der Prüfung
 
-Die Leistungsbeschreibung ist Prüfpunkt HR-06 in unserem [Prüfkatalog](/handwerkerrechnung/pruefkatalog) und dort mit dem höchsten Schweregrad hinterlegt — nicht, weil eine Sammelposition an sich schwer wiegt, sondern weil sie alle anderen Prüfungen blockiert. Der Bericht nennt die betroffene Position immer wörtlich, damit Sie sie in Ihrer Nachfrage zitieren können.
+Die Leistungsbeschreibung ist Prüfpunkt HR-06 in unserem [Prüfkatalog](/handwerkerrechnung/pruefkatalog), mit dem höchsten Schweregrad. Eine Sammelposition wiegt für sich genommen nicht schwer. Sie blockiert nur alle anderen Prüfungen. Der Bericht nennt die betroffene Position immer wörtlich, damit Sie sie in Ihrer Nachfrage zitieren können.
 
 Die [Vorschau](/handwerkerrechnung/pruefung) ist kostenlos.

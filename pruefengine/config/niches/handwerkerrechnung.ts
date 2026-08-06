@@ -33,7 +33,7 @@ export const handwerkerrechnung: NicheConfig = {
 
   brand: {
     name: 'Handwerkerrechnung prüfen',
-    claim: 'Was auf der Rechnung steht — und was fehlt.',
+    claim: 'Was draufsteht. Und was fehlt.',
     accent: '#1f5f4f',
   },
 
@@ -216,11 +216,11 @@ export const handwerkerrechnung: NicheConfig = {
         priceCents: 2490,
         stripePriceId: process.env.STRIPE_PRICE_HANDWERKERRECHNUNG_BASIS || '',
         includes: [
-          'Alle Feststellungen im Wortlaut, nach Schweregrad sortiert',
-          'Zu jeder Feststellung die Fundstelle im Dokument',
-          'Zu jeder Feststellung genau ein Satz, den Sie schreiben oder sagen können',
-          'Finanzielle Spanne je Feststellung und in der Summe',
-          'PDF-Bericht mit Katalogversion und Prüfdatum',
+          'Alle Feststellungen im Wortlaut, schwerste zuerst',
+          'Zu jeder die Stelle aus Ihrer Rechnung',
+          'Zu jeder ein fertiger Satz zum Schreiben oder Sagen',
+          'Spanne in Euro, je Feststellung und zusammen',
+          'PDF mit Katalogversion und Prüfdatum',
         ],
       },
       {
@@ -230,9 +230,9 @@ export const handwerkerrechnung: NicheConfig = {
         stripePriceId: process.env.STRIPE_PRICE_HANDWERKERRECHNUNG_PLUS || '',
         includes: [
           'Alles aus dem Vollbericht',
-          'Fertiges Anschreiben an den Betrieb, auf Ihre Feststellungen zugeschnitten',
-          'Positionsliste zum Abhaken für das Gespräch',
-          'Zweite Prüfung der korrigierten Rechnung innerhalb von 14 Tagen',
+          'Fertiges Anschreiben an den Betrieb, auf Ihre Funde zugeschnitten',
+          'Positionsliste zum Abhaken fürs Gespräch',
+          'Zweite Prüfung der korrigierten Rechnung, 14 Tage lang',
         ],
         // Zwei zusätzliche Abschnitte im PDF. Beide werden generisch aus den
         // Feststellungen erzeugt, eine neue Nische bekommt sie ohne Code.
@@ -271,18 +271,18 @@ export const handwerkerrechnung: NicheConfig = {
   },
 
   landing: {
-    h1: 'Handwerkerrechnung prüfen lassen — in zwei Minuten',
+    h1: 'Handwerkerrechnung prüfen lassen, in zwei Minuten',
     subline:
-      'Laden Sie Ihre Rechnung hoch. Wir prüfen sie gegen 33 veröffentlichte Prüfpunkte: Pflichtangaben, Steuerabzug, Stundensätze, Anfahrt, Zuschläge, Rechenwege. Sie sehen sofort, wie viele Abweichungen gefunden wurden.',
+      'Rechnung hochladen, fertig. Wir gehen 33 Punkte durch: Pflichtangaben, Steuerabzug, Stundensätze, Anfahrt, Zuschläge, Rechenwege. Sie sehen sofort, wie viel dabei herauskommt.',
     proofPoints: [
-      'Der Prüfkatalog ist öffentlich. Sie sehen vor dem Hochladen, wonach gesucht wird.',
-      'Jede Feststellung nennt ihre Grundlage: Paragraf oder benanntes Referenzband.',
-      'Jede Feststellung endet mit einem Satz, den Sie wörtlich schreiben oder sagen können.',
-      'Die Vorschau ist kostenlos. Bezahlt wird erst, wenn etwas gefunden wurde.',
-      'Ihr Dokument wird nach 14 Tagen automatisch gelöscht.',
+      'Der Prüfkatalog steht offen im Netz. Lesen Sie ihn, bevor Sie etwas hochladen.',
+      'Zu jeder Feststellung gehört ein Paragraf oder ein Referenzband mit Zahlen.',
+      'Am Ende jeder Feststellung steht ein Satz, den Sie so verschicken können.',
+      'Die Vorschau kostet nichts. Zahlen Sie erst, wenn wir etwas gefunden haben.',
+      'Nach 14 Tagen löscht das System Ihre Datei von selbst.',
     ],
     competitorAnchor:
-      'Ein Erstberatungsgespräch bei einer Rechtsanwältin oder einem Rechtsanwalt kostet nach § 34 RVG bis zu 190 Euro zuzüglich Umsatzsteuer. Diese Prüfung ersetzt das nicht — sie sagt Ihnen, ob sich der Weg dorthin lohnt.',
+      'Ein Erstberatungsgespräch bei einem Anwalt kostet nach § 34 RVG bis zu 190 Euro plus Umsatzsteuer. Diese Prüfung ersetzt das nicht. Sie sagt Ihnen, ob sich der Weg dorthin lohnt.',
     sample: {
       docTitle: 'Rechnung Nr. 2026-0847',
       docMeta: ['Sanitär, Heizung, Klima', 'Reparatur Warmwasser', 'Rechnungsbetrag 1.184,05 Euro brutto'],
@@ -320,36 +320,36 @@ export const handwerkerrechnung: NicheConfig = {
     },
     faq: [
       {
-        q: 'Was genau bekomme ich?',
-        a: 'Einen PDF-Bericht mit allen Feststellungen, jeweils mit Fundstelle im Dokument, Grundlage (Paragraf oder Referenzband), finanzieller Spanne und genau einem Satz, den Sie an den Betrieb schreiben oder im Gespräch sagen können. Zusätzlich die Katalogversion und das Prüfdatum, damit der Bericht auch in einem halben Jahr noch erklärbar ist.',
+        q: 'Was bekomme ich für mein Geld?',
+        a: 'Ein PDF. Darin steht jede Feststellung mit der Stelle aus Ihrer Rechnung, dem Paragrafen oder Referenzband dahinter, einer Spanne in Euro und einem fertigen Satz für den Betrieb. Auf dem Deckblatt stehen Prüfdatum und Katalogversion, damit Sie in einem halben Jahr noch wissen, wonach geprüft wurde.',
       },
       {
         q: 'Ist das eine Rechtsberatung?',
-        a: 'Nein. Es ist eine technische Plausibilitätsprüfung gegen einen veröffentlichten Katalog. Der Bericht stellt fest, was fehlt oder von einer Regelung oder einem üblichen Band abweicht. Er bewertet nicht, ob eine Forderung durchsetzbar ist — das ist Sache einer anwaltlichen Beratung.',
+        a: 'Nein. Wir prüfen Ihre Rechnung gegen einen veröffentlichten Katalog und sagen Ihnen, was fehlt oder von der üblichen Spanne abweicht. Ob eine Forderung durchsetzbar ist, beantwortet ein Anwalt.',
       },
       {
-        q: 'Warum sehe ich in der Vorschau nicht alles?',
-        a: 'Die Vorschau zeigt Ihnen kostenlos, wie viele Abweichungen gefunden wurden, wie schwer sie wiegen und welche Kategorien betroffen sind — dazu eine vollständig ausformulierte Feststellung als Kostprobe. Der Rest ist die bezahlte Leistung. Wird nichts gefunden, bieten wir Ihnen den Kauf gar nicht erst an.',
+        q: 'Warum zeigt die Vorschau nicht alles?',
+        a: 'Kostenlos sehen Sie die Anzahl der Funde, ihre Schwere, die betroffenen Kategorien und einen Fund vollständig ausformuliert. Der Rest ist die Leistung, für die Sie zahlen. Finden wir gar nichts, gibt es auch nichts zu kaufen.',
       },
       {
         q: 'Was passiert mit meiner Rechnung?',
-        a: 'Die Datei wird zur Analyse an Anthropic übermittelt und dort nicht zum Training verwendet. Ergebnis und Dokumentbezug werden 14 Tage zwischengespeichert und danach automatisch gelöscht. Details in der Datenschutzerklärung.',
+        a: 'Die Datei geht zur Analyse an Anthropic und wird dort nicht zum Training verwendet. Ergebnis und Dokumentbezug bleiben 14 Tage im Zwischenspeicher, danach löscht das System sie. Mehr dazu in der Datenschutzerklärung.',
       },
       {
-        q: 'Was ist, wenn nichts gefunden wird?',
-        a: 'Dann sagen wir das, und es gibt nichts zu kaufen. Dasselbe gilt, wenn das Dokument unlesbar ist oder gar keine Rechnung: Wir sagen "nicht beurteilbar" und bieten keinen Kauf an.',
+        q: 'Und wenn meine Rechnung in Ordnung ist?',
+        a: 'Dann sagen wir Ihnen das und bieten Ihnen keinen Bericht an. Genauso, wenn wir die Datei nicht lesen können oder es gar keine Rechnung ist. Dann steht da „nicht beurteilbar" und der Kauf-Knopf erscheint erst gar nicht.',
       },
       {
-        q: 'Kann ich das nicht selbst in ein KI-Werkzeug werfen?',
-        a: 'Sie können. Was Sie dabei nicht bekommen, ist der Prüfmassstab: 33 benannte Prüfpunkte mit Paragraf oder Referenzband, in einer versionierten Fassung, gegen die jede Rechnung gleich geprüft wird — und ein Bericht, der später noch nachvollziehbar ist, weil die Katalogversion darin steht.',
+        q: 'Kann ich das nicht selbst in ChatGPT werfen?',
+        a: 'Können Sie. Was dabei fehlt, ist der Maßstab. Hier sind es 33 benannte Punkte, jeder mit Paragraf oder Referenzband, in einer Fassung mit Versionsnummer. Jede Rechnung läuft gegen dieselben 33. Im Bericht steht die Version, deshalb lässt er sich später noch nachvollziehen.',
       },
       {
-        q: 'Wie lange dauert die Prüfung?',
-        a: 'Die Analyse laeuft in der Regel in unter einer Minute. Danach sehen Sie die kostenlose Vorschau; der Vollbericht steht unmittelbar nach der Zahlung als PDF bereit und geht zusätzlich per E-Mail an Sie.',
+        q: 'Wie lange dauert das?',
+        a: 'Die Analyse braucht meist unter einer Minute. Danach kommt die Vorschau. Nach der Zahlung steht das PDF sofort bereit und geht zusätzlich per E-Mail raus.',
       },
       {
-        q: 'Gilt ein Widerrufsrecht?',
-        a: 'Ja, grundsätzlich 14 Tage. Weil der Bericht sofort bereitsteht, müssen Sie beim Kauf ausdrücklich zustimmen, dass wir vor Ablauf der Frist beginnen, und bestätigen, dass Sie damit Ihr Widerrufsrecht verlieren (§ 356 Abs. 5 BGB). Die Erklärung wird im Wortlaut mit Zeitstempel protokolliert.',
+        q: 'Kann ich widerrufen?',
+        a: 'Grundsätzlich haben Sie 14 Tage. Weil der Bericht sofort bereitsteht, müssen Sie beim Kauf ankreuzen, dass wir vorher anfangen dürfen, und bestätigen, dass Sie damit Ihr Widerrufsrecht verlieren (§ 356 Abs. 5 BGB). Diese Erklärung protokollieren wir im Wortlaut mit Zeitstempel.',
       },
     ],
   },

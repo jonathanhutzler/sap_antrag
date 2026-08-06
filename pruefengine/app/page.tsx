@@ -16,20 +16,20 @@ import { JsonLd, faqLd, organizationLd } from '@/components/JsonLd';
 
 const HUB_FAQ = [
   {
-    q: 'Warum eine Dachdomain und nicht je Thema eine eigene Seite?',
-    a: 'Weil der Prüfmaßstab derselbe ist. Ein veröffentlichter Katalog, eine belegte Fundstelle je Feststellung, ein Satz zum Handeln — das gilt für eine Handwerkerrechnung genauso wie für jede andere Abrechnung. Was sich unterscheidet, sind die Prüfpunkte. Die stehen in einer eigenen, versionierten Datei je Prüfung.',
+    q: 'Warum mehrere Prüfungen unter einem Dach?',
+    a: 'Der Maßstab ist überall derselbe. Ein Katalog, den Sie vorher lesen können. Ein Zitat aus Ihrem Dokument zu jeder Feststellung. Ein Satz, mit dem Sie weiterkommen. Nur die Prüfpunkte unterscheiden sich, und die stehen je Prüfung in einer eigenen Datei mit Versionsnummer.',
   },
   {
-    q: 'Was heißt „technische Plausibilitätsprüfung"?',
-    a: 'Wir stellen fest, was in einem Dokument fehlt, was von einer Regelung abweicht und was außerhalb eines üblichen Bandes liegt — jeweils mit Zitat aus Ihrem Dokument und mit benannter Grundlage. Wir sagen nicht, ob eine Forderung durchsetzbar ist. Das ist Rechtsberatung und die machen wir nicht.',
+    q: 'Was heißt technische Plausibilitätsprüfung?',
+    a: 'Wir sagen Ihnen, was in einem Dokument fehlt, was von einer Vorschrift abweicht und was außerhalb der üblichen Spanne liegt. Zu jedem Punkt gehört ein Zitat und die Norm oder das Referenzband, auf das er sich stützt. Ob Sie zahlen müssen, sagen wir nicht. Das wäre Rechtsberatung.',
   },
   {
-    q: 'Was kostet die Prüfung?',
-    a: 'Die Vorschau kostet nichts: Sie sehen, wie viele Abweichungen gefunden wurden, wie schwer sie wiegen und welche Kategorien betroffen sind, dazu eine vollständig ausformulierte Feststellung. Bezahlt wird nur der Vollbericht. Wird nichts gefunden oder ist das Dokument nicht prüfbar, gibt es nichts zu kaufen.',
+    q: 'Was kostet das?',
+    a: 'Die Vorschau nichts. Sie sehen die Anzahl der Funde, ihre Schwere, die betroffenen Kategorien und einen Fund komplett ausformuliert. Geld kostet nur der Vollbericht. Finden wir nichts oder lässt sich Ihr Dokument nicht lesen, bieten wir Ihnen auch nichts an.',
   },
   {
     q: 'Was passiert mit meinen Dokumenten?',
-    a: 'Sie werden zur Analyse übermittelt und dort nicht zum Training von Modellen verwendet. Ergebnis und Dokumentbezug werden für die in der jeweiligen Prüfung genannte Frist zwischengespeichert und danach automatisch gelöscht. Die Auftragsverarbeiter stehen namentlich in der Datenschutzerklärung.',
+    a: 'Sie gehen zur Analyse an Anthropic und werden dort nicht zum Training verwendet. Ergebnis und Dokumentbezug liegen für die in der jeweiligen Prüfung genannte Frist im Zwischenspeicher, danach löscht das System sie selbst. Wer sonst noch beteiligt ist, steht mit Namen in der Datenschutzerklärung.',
   },
 ];
 
@@ -50,13 +50,12 @@ export default function HubPage() {
       <section className="pt-16 sm:pt-24">
         <p className="eyebrow">{site.name}</p>
         <h1 className="mt-4 max-w-[19ch] text-display-xl">
-          Der Maßstab steht fest, <span className="text-accent">bevor</span> Sie hochladen.
+          Sie lesen den Katalog, <span className="text-accent">bevor</span> Sie hochladen.
         </h1>
         <p className="mt-6 max-w-prose text-[1.12rem] leading-[1.62] text-ink-muted">
-          Die meisten Prüfangebote sagen Ihnen erst hinterher, wonach sie gesucht haben. Wir machen es umgekehrt:
-          Jede Prüfung hat einen öffentlichen Katalog. Sie lesen vorher, welche Punkte geprüft werden und worauf
-          jeder einzelne sich stützt — Paragraf oder benanntes Referenzband. Danach bekommen Sie zu jedem Fund
-          das Zitat aus Ihrem eigenen Dokument.
+          Bei den meisten Prüfangeboten erfahren Sie erst hinterher, wonach gesucht wurde. Hier steht der Katalog
+          vorher offen. Jeder Punkt darin nennt seine Grundlage: einen Paragrafen oder ein Referenzband mit
+          Zahlen. Findet die Prüfung etwas, bekommen Sie die Stelle aus Ihrem eigenen Dokument dazu.
         </p>
 
         <div className="mt-9 flex flex-wrap gap-3">
@@ -79,17 +78,17 @@ export default function HubPage() {
             {
               n: '01',
               h: 'Der Katalog ist öffentlich',
-              p: 'Jede Prüfung veröffentlicht ihre Prüfpunkte samt Grundlage und Versionsnummer. Sie können sie lesen, bevor Sie etwas hochladen — und hinterher nachschlagen, wonach geprüft wurde.',
+              p: 'Jeder Prüfpunkt steht im Netz, mit Grundlage und Versionsnummer. Vorher zum Lesen. Hinterher zum Nachschlagen, wonach eigentlich geprüft wurde.',
             },
             {
               n: '02',
-              h: 'Jeder Fund zeigt seine Fundstelle',
-              p: 'Keine Feststellung ohne Zitat aus Ihrem Dokument. Was sich nicht belegen lässt, kommt nicht in den Bericht. Beträge nennen wir nur als Spanne und nur, wenn Zahlen im Dokument sie tragen.',
+              h: 'Jeder Fund zeigt seine Stelle',
+              p: 'Ohne Zitat aus Ihrem Dokument keine Feststellung. Beträge nennen wir als Spanne und nur dann, wenn Zahlen im Dokument sie hergeben.',
             },
             {
               n: '03',
               h: 'Jeder Fund endet in einem Satz',
-              p: 'Zu jeder Feststellung gehört genau eine Handlung — formuliert als Satz, den Sie wörtlich schreiben oder sagen können. Ein Bericht, aus dem nichts folgt, hilft niemandem.',
+              p: 'Zu jeder Feststellung gehört ein fertiger Satz zum Schreiben oder Sagen. Kein „lassen Sie das prüfen". Aus einem Bericht muss etwas folgen.',
             },
           ].map((item) => (
             <div key={item.n} className="bg-paper-raised p-7">
@@ -105,12 +104,12 @@ export default function HubPage() {
       <section className="mt-24">
         <div className="sheet grid gap-8 p-8 sm:grid-cols-2 sm:p-10">
           <div>
-            <p className="eyebrow">Was Sie bekommen</p>
+            <p className="eyebrow">Im Bericht</p>
             <ul className="mt-4 space-y-3 font-sans text-[0.97rem] text-ink">
               {[
-                'Eine Feststellung je Prüfpunkt, mit Zitat und Grundlage',
-                'Einen Satz zum Handeln je Feststellung',
-                'Eine finanzielle Spanne, wo das Dokument sie hergibt',
+                'Jede Feststellung mit Zitat und Grundlage',
+                'Ein fertiger Satz zum Schreiben oder Sagen',
+                'Eine Spanne in Euro, wo das Dokument sie hergibt',
                 'Ein PDF mit Prüfdatum und Katalogversion',
               ].map((item) => (
                 <li key={item} className="flex gap-3">
@@ -121,13 +120,13 @@ export default function HubPage() {
             </ul>
           </div>
           <div>
-            <p className="eyebrow">Was Sie nicht bekommen</p>
+            <p className="eyebrow">Nicht im Bericht</p>
             <ul className="mt-4 space-y-3 font-sans text-[0.97rem] text-ink-muted">
               {[
-                'Keine Rechts-, Steuer- oder Fachberatung',
-                'Kein Sachverständigengutachten',
-                'Keine Aussage darüber, ob eine Forderung durchsetzbar ist',
-                'Keine Bewertung des Betriebs, der die Abrechnung gestellt hat',
+                'Rechts-, Steuer- oder Fachberatung',
+                'Ein Sachverständigengutachten',
+                'Die Antwort, ob eine Forderung durchsetzbar ist',
+                'Ein Urteil über den Betrieb, der die Abrechnung gestellt hat',
               ].map((item) => (
                 <li key={item} className="flex gap-3">
                   <span className="mt-[0.52em] h-1 w-1 shrink-0 rounded-full bg-ink-faint" aria-hidden />
@@ -147,8 +146,8 @@ export default function HubPage() {
           Katalog
         </h2>
         <p className="mt-4 max-w-prose text-ink-muted">
-          Eine Prüfung wird erst freigeschaltet, wenn ihr Katalog fertig und veröffentlicht ist. Ein Thema ohne
-          eigenen Maßstab bekommt hier keine Seite.
+          Freigeschaltet wird eine Prüfung erst, wenn ihr Katalog fertig ist. Solange es keinen gibt, gibt es hier
+          auch keine Seite dazu.
         </p>
 
         <div className="mt-10 space-y-5">
@@ -190,7 +189,7 @@ export default function HubPage() {
       {/* FAQ */}
       <section className="mt-24">
         <p className="eyebrow">Häufige Fragen</p>
-        <h2 className="mt-3 text-display-lg">Zum Prinzip</h2>
+        <h2 className="mt-3 text-display-lg">Wie das hier läuft</h2>
 
         <dl className="mt-8 divide-y divide-rule border-y border-rule">
           {HUB_FAQ.map((entry) => (
