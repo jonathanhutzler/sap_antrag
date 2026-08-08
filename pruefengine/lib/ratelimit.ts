@@ -1,13 +1,19 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import { ipMatches } from './ip';
 
 /**
  * Rate-Limiting ab Tag 1 auf der Analyse-Route.
  *
  * Ein Modellaufruf auf einem mehrseitigen PDF kostet echtes Geld; ohne Limit
- * ist die Route eine offene Rechnung. Die eigene IP wird über
+ * ist die Route eine offene Rechnung. Die eigene Verbindung wird über
  * RATE_LIMIT_ALLOWLIST_IPS ausgenommen, damit Tests und Demos nicht am
  * eigenen Limit hängenbleiben.
+ *
+ * Die Liste ist kommagetrennt und versteht drei Formen:
+ *   2a02:8109:abcd:1234::         IPv6, verglichen über die ersten 64 Bit
+ *   2a02:8109:abcd::/48           IPv6 mit eigener Präfixlänge
+ *   84.112.9.7                    IPv4, exakt
  */
 
 let limiter: Ratelimit | null = null;
@@ -47,8 +53,19 @@ export interface RateLimitVerdict {
   reason?: 'allowlist' | 'not-configured' | 'limit';
 }
 
+/**
+ * Ausnahme für die eigene Verbindung.
+ *
+ * Verglichen wird über Präfixe, nicht exakt: IPv6-Anschlüsse rotieren das
+ * Geräte-Suffix, eine hart eingetragene Adresse passt nach zwei Tagen nicht
+ * mehr. Details in lib/ip.ts.
+ */
+export function isAllowlisted(ip: string): boolean {
+  return allowlist().some((entry) => ipMatches(ip, entry));
+}
+
 export async function checkRateLimit(ip: string): Promise<RateLimitVerdict> {
-  if (allowlist().includes(ip)) {
+  if (isAllowlisted(ip)) {
     return { allowed: true, remaining: 999, resetInSeconds: 0, reason: 'allowlist' };
   }
 

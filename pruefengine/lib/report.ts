@@ -148,6 +148,14 @@ function sectionSummary(doc: Doc, result: AnalysisResult, niche: NicheConfig): v
     doc.moveDown(0.6);
     body(doc, result.docSummary, { color: '#57564d' });
   }
+
+  // Abweichung zwischen der Angabe des Auftraggebers und der gelesenen Summe.
+  // Gerechnet wurde mit der Angabe; der Unterschied steht im Bericht, damit
+  // niemand später über eine Zahl stolpert, die er nicht zuordnen kann.
+  if (result.anchorNote) {
+    doc.moveDown(0.6);
+    body(doc, result.anchorNote, { color: '#57564d' });
+  }
 }
 
 function sectionFindings(doc: Doc, result: AnalysisResult): void {

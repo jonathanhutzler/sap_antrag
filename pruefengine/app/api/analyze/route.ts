@@ -173,6 +173,10 @@ export async function POST(request: Request) {
       // keine Handlungssätze der verborgenen Funde in dieser Antwort.
       purchasable: canPurchase(result),
       docSummary: result.docSummary,
+      // Der Hinweis auf eine Abweichung zwischen Angabe und gelesener Summe
+      // gehört vor die Bezahlschranke. Wer die falsche Zahl eingetippt hat,
+      // soll das sehen, bevor er kauft.
+      anchorNote: result.anchorNote ?? null,
       counts: stats.counts,
       totalFindings: stats.total,
       categories: stats.categories,

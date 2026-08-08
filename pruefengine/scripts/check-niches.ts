@@ -9,7 +9,7 @@
  *
  * Aufruf: npm run check:niches
  */
-import { existsSync, readdirSync } from 'fs';
+import { existsSync, readdirSync, readFileSync } from 'fs';
 import path from 'path';
 import { registry } from '../config/registry';
 import { hasPlaceholders, site } from '../config/site';
@@ -18,6 +18,15 @@ import { getCalculator } from '../lib/calculators';
 import { SERIES } from '../lib/data/zinsreihe';
 import { getFreeTool } from '../components/freetools';
 import type { NicheConfig } from '../config/schema';
+
+/** Kleinschreibung, keine Satzzeichen, einfache Leerzeichen. */
+function normalize(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 let errors = 0;
 let warnings = 0;
@@ -133,6 +142,30 @@ function checkActive(niche: NicheConfig): void {
     }
   }
 
+  const efforts = ['low', 'medium', 'high', 'xhigh', 'max'];
+  if (niche.ai.effort && !efforts.includes(niche.ai.effort)) {
+    fail(where, `ai.effort ist „${niche.ai.effort}". Erlaubt: ${efforts.join(', ')}.`);
+  }
+  if (niche.ai.effort && niche.ai.effort !== 'high') {
+    // Kein Fehler, aber es soll niemand vergessen, warum der Wert dasteht.
+    warn(
+      where,
+      `ai.effort steht auf „${niche.ai.effort}". Vor einer Senkung gehört eine Messung mit npm run measure:effort — dabei kann eine ganze Prüfkategorie wegfallen.`,
+    );
+  }
+
+  const maxFindings = niche.ai.maxFindings;
+  if (maxFindings !== undefined) {
+    if (!Number.isInteger(maxFindings) || maxFindings < 1) {
+      fail(where, `ai.maxFindings ist ${maxFindings}. Erwartet wird eine ganze Zahl ab 1.`);
+    } else if (maxFindings > niche.catalogue.checks.length) {
+      warn(
+        where,
+        `ai.maxFindings (${maxFindings}) liegt über der Kataloggröße (${niche.catalogue.checks.length}) und greift damit nie.`,
+      );
+    }
+  }
+
   // 5. Recht
   if (niche.legal.dataRetentionHours <= 0) fail(where, 'dataRetentionHours muss größer als 0 sein.');
 
@@ -141,6 +174,23 @@ function checkActive(niche: NicheConfig): void {
   const articles = existsSync(blogDir) ? readdirSync(blogDir).filter((f) => f.endsWith('.md')) : [];
   if (articles.length < 8) {
     warn(where, `nur ${articles.length} Artikel im Silo content/blog/${niche.slug}/ — angepeilt sind 8 bis 10.`);
+  }
+
+  // Keyword-Kollision. Zwei eigene Seiten auf denselben Begriff schwächen
+  // beide, und die Geldseite verliert dabei mehr. Verglichen wird die
+  // Kernphrase der H1 gegen jeden Artikeltitel.
+  const moneyPhrase = normalize(niche.landing.h1.split(/[,:.—–-]/)[0]);
+  if (moneyPhrase.split(' ').length >= 2) {
+    for (const file of articles) {
+      const source = readFileSync(path.join(blogDir, file), 'utf8');
+      const title = source.match(/^title:\s*(.+)$/m)?.[1]?.trim() ?? '';
+      if (title && normalize(title).includes(moneyPhrase)) {
+        warn(
+          where,
+          `content/blog/${niche.slug}/${file} greift dasselbe Keyword an wie die Landing („${moneyPhrase}"). Andere Suchabsicht wählen.`,
+        );
+      }
+    }
   }
 
   // 7. Der generierte Prompt muss den Katalog tatsächlich enthalten.

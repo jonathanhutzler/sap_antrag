@@ -10,8 +10,19 @@
  * ihn mit Zeitstempel. Ein Client, der etwas anderes anzeigt, kommt damit
  * nicht durch das Bezahl-Gate.
  */
+/**
+ * Zwei Sätze, weil § 356 Abs. 5 BGB zwei Erklärungen verlangt: die
+ * ausdrückliche Zustimmung zum sofortigen Beginn (Nr. 1) und die Bestätigung
+ * der Kenntnis vom Wegfall des Widerrufsrechts (Nr. 2). Fehlt der zweite
+ * Satz, erlischt das Widerrufsrecht nicht — der Kunde liest den ganzen
+ * Bericht und widerruft danach.
+ *
+ * „Erlischt" statt „verliere": Nr. 2 formuliert zwar „verliert", Satz 1
+ * derselben Vorschrift sagt „erlischt". Die geforderte Substanz ist in beiden
+ * Fällen dieselbe, und „erlischt" klingt nach Fristablauf statt nach Verlust.
+ */
 export const WAIVER_TEXT =
-  'Ich stimme ausdrücklich zu, dass Sie mit der Ausführung des Vertrages vor Ablauf der Widerrufsfrist beginnen. Mir ist bekannt, dass ich durch diese Zustimmung mit Beginn der Ausführung des Vertrages mein Widerrufsrecht verliere.';
+  'Ich stimme ausdrücklich zu, dass Sie mit der Ausführung des Vertrages vor Ablauf der Widerrufsfrist beginnen. Mir ist bekannt, dass mein Widerrufsrecht mit Beginn der Ausführung des Vertrages erlischt.';
 
 /** Vergleich ohne Rücksicht auf Zeilenumbrüche und doppelte Leerzeichen. */
 export function waiverTextMatches(candidate: unknown): boolean {

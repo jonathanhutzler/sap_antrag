@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { Severity } from '@/config/schema';
 import { SEVERITY_LABEL_PLURAL, SeverityTag } from './ui/Severity';
 import { trackClient } from '@/lib/track';
+import { readJson } from '@/lib/http';
 import { WAIVER_TEXT } from '@/lib/waiver';
 
 /**
@@ -68,6 +69,8 @@ interface PreviewResponse {
   catalogueSize?: number;
   sample?: PreviewSample[];
   hiddenFindings?: number;
+  /** Angabe des Nutzers und gelesene Summe gehen auseinander. */
+  anchorNote?: string | null;
   /** Nur Rechennischen: Lage der Forderung zum errechneten Band. */
   position?: 'innerhalb' | 'oberhalb' | 'unterhalb' | null;
 }
@@ -141,10 +144,12 @@ export function PruefFlow({ config }: { config: FlowConfig }) {
 
     try {
       const response = await fetch('/api/analyze', { method: 'POST', body: form });
-      const data = (await response.json()) as PreviewResponse & { error?: string };
+      // Erst Text, dann parsen. Bei Timeout oder Absturz kommt Klartext
+      // zurück, und der darf nicht als „Unexpected token" beim Nutzer landen.
+      const { ok, data, error: message } = await readJson<PreviewResponse>(response);
 
-      if (!response.ok) {
-        setError(data.error ?? 'Die Prüfung ist fehlgeschlagen.');
+      if (!ok || !data) {
+        setError(message ?? 'Die Prüfung ist fehlgeschlagen.');
         return;
       }
 
@@ -181,9 +186,9 @@ export function PruefFlow({ config }: { config: FlowConfig }) {
         }),
       });
 
-      const data = (await response.json()) as { url?: string; error?: string };
-      if (!response.ok || !data.url) {
-        setCheckoutError(data.error ?? 'Die Zahlung konnte nicht gestartet werden.');
+      const { ok, data, error: message } = await readJson<{ url?: string }>(response);
+      if (!ok || !data?.url) {
+        setCheckoutError(message ?? 'Die Zahlung konnte nicht gestartet werden.');
         return;
       }
       window.location.href = data.url;
@@ -334,6 +339,18 @@ export function PruefFlow({ config }: { config: FlowConfig }) {
               Zu kaufen gibt es hier nichts. Versuchen Sie es gern noch einmal: als PDF aus dem Original oder als Foto,
               auf dem die ganze Seite scharf ist.
             </p>
+          </div>
+        )}
+
+        {/*
+          Abweichung zwischen Ihrer Angabe und der gelesenen Summe. Steht vor
+          der Bezahlschranke: Wer sich vertippt hat, soll das sehen, bevor er
+          kauft.
+        */}
+        {preview && preview.assessable && preview.anchorNote && (
+          <div className="sheet border-l-4 border-l-amber-500 p-7 sm:p-8">
+            <p className="eyebrow">Bitte prüfen</p>
+            <p className="mt-3 font-sans leading-relaxed text-ink">{preview.anchorNote}</p>
           </div>
         )}
 

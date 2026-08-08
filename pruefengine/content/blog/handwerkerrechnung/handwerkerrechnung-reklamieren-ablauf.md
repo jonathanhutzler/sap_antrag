@@ -2,7 +2,7 @@
 title: Handwerkerrechnung reklamieren — der Ablauf in fünf Schritten
 description: Wie eine Reklamation aufgebaut ist, die beantwortet wird, und wo die Grenze zur Rechtsberatung verläuft.
 date: 2026-05-13
-related: [handwerkerrechnung-zu-hoch, handwerkerrechnung-pruefen-lassen, abschlagszahlungen-schlussrechnung]
+related: [handwerkerrechnung-zu-hoch, handwerkerrechnung-anwalt-sachverstaendiger-kosten, abschlagszahlungen-schlussrechnung]
 ---
 
 Manche Reklamationen werden beantwortet, andere bleiben im Postfach liegen. Meistens entscheidet darüber der Aufbau, nicht der Ton.

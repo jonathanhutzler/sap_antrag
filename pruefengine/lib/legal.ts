@@ -47,6 +47,24 @@ export async function logWaiver(record: Omit<WaiverRecord, 'text' | 'acceptedAt'
   return full;
 }
 
+/**
+ * Protokollierten Verzicht laden.
+ *
+ * Die Vertragsbestätigung nach § 312f BGB zitiert den Wortlaut, dem der Kunde
+ * tatsächlich zugestimmt hat — nicht den, der heute in der Konstante steht.
+ * Ändert sich die Formulierung, bleiben alte Bestätigungen dadurch richtig.
+ */
+export async function loadWaiver(resultId: string): Promise<WaiverRecord | null> {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+
+  const redis = new Redis({ url, token });
+  const value = await redis.get<string | WaiverRecord>(`waiver:${resultId}`);
+  if (!value) return null;
+  return typeof value === 'string' ? (JSON.parse(value) as WaiverRecord) : value;
+}
+
 export function waiverInput(ip: string, userAgent: string | null): { ipHash: string; userAgent: string } {
   return { ipHash: hashIp(ip), userAgent: (userAgent || '').slice(0, 200) };
 }

@@ -4,7 +4,8 @@ import { getStripe } from '@/lib/stripe';
 import { findNiche } from '@/config/registry';
 import { loadResult, markPaid } from '@/lib/store';
 import { buildReportPdf } from '@/lib/report';
-import { sendReportMail } from '@/lib/mail';
+import { sendConfirmationMail, sendReportMail } from '@/lib/mail';
+import { recordFailedMail } from '@/lib/mailqueue';
 import { trackServer } from '@/lib/events';
 
 export const runtime = 'nodejs';
@@ -87,16 +88,39 @@ export async function POST(request: Request) {
     tier,
   });
 
+  // Reihenfolge mit Absicht: erst die Vertragsbestätigung nach § 312f BGB,
+  // dann der Bericht. Die Bestätigung ist Pflicht und darf nicht daran
+  // scheitern, dass ein PDF nicht gebaut werden kann.
+  try {
+    const confirmation = await sendConfirmationMail(result, niche);
+    if (!confirmation.sent) {
+      await recordFailedMail({
+        resultId,
+        niche: niche.slug,
+        kind: 'confirmation',
+        reason: confirmation.reason ?? 'unbekannt',
+      });
+    }
+  } catch (err) {
+    await recordFailedMail({
+      resultId,
+      niche: niche.slug,
+      kind: 'confirmation',
+      reason: String(err),
+    });
+  }
+
   try {
     const pdf = await buildReportPdf(result, niche);
     const mail = await sendReportMail(result, niche, pdf);
     if (!mail.sent) {
-      console.error(JSON.stringify({ type: 'mail_skipped', resultId, reason: mail.reason }));
+      await recordFailedMail({ resultId, niche: niche.slug, kind: 'report', reason: mail.reason ?? 'unbekannt' });
     }
   } catch (err) {
     // Der Bericht bleibt über die Ergebnisseite abrufbar; ein fehlgeschlagener
     // Versand darf den Webhook nicht in einen Retry-Sturm schicken.
     console.error(JSON.stringify({ type: 'report_error', resultId, error: String(err) }));
+    await recordFailedMail({ resultId, niche: niche.slug, kind: 'report', reason: String(err) });
   }
 
   return NextResponse.json({ received: true });

@@ -13,7 +13,10 @@
     "smoke:sanitize": "tsx scripts/smoke-sanitize.ts",
     "smoke:report": "tsx scripts/smoke-report.ts",
     "test:vfe": "tsx scripts/test-vfe-calculator.ts",
-    "check": "npm run typecheck && npm run check:niches && npm run smoke:sanitize && npm run smoke:report && npm run test:vfe"
+    "test:ip": "tsx scripts/test-ip.ts",
+    "mail:resend": "tsx scripts/resend-mails.ts",
+    "measure:effort": "tsx scripts/measure-effort.ts",
+    "check": "npm run typecheck && npm run check:niches && npm run smoke:sanitize && npm run smoke:report && npm run test:vfe && npm run test:ip"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",

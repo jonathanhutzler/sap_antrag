@@ -2,7 +2,7 @@
 title: Handwerkerrechnung höher als erwartet — die ersten Schritte
 description: Fünf Dinge, die Sie selbst an der Rechnung prüfen können, bevor Sie überweisen oder die Zahlung zurückhalten. Plus der Text für die Rückfrage.
 date: 2026-07-08
-related: [handwerkerrechnung-pruefen-lassen, stundensatz-handwerker, kostenvoranschlag-ueberschritten]
+related: [handwerkerrechnung-anwalt-sachverstaendiger-kosten, stundensatz-handwerker, kostenvoranschlag-ueberschritten]
 ---
 
 Die Rechnung ist da und liegt weit über dem, womit Sie gerechnet haben. Der Impuls, sofort anzurufen, ist verständlich. Er hilft nur wenig, solange Sie nicht sagen können, welche Position Sie meinen. Die folgenden fünf Schritte schaffen Sie in einer halben Stunde am Küchentisch.

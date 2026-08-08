@@ -32,24 +32,29 @@ const FORBIDDEN: Array<{ stem: string; replacement: string | null; label: string
   { stem: 'unwirksam', replacement: 'von der gesetzlichen Regelung abweichend', label: 'unwirksam' },
   { stem: 'rechtswidrig', replacement: 'von der gesetzlichen Regelung abweichend', label: 'rechtswidrig' },
   { stem: 'nichtig', replacement: 'von der gesetzlichen Regelung abweichend', label: 'nichtig' },
+  { stem: 'sittenwidrig', replacement: 'von der gesetzlichen Regelung abweichend', label: 'sittenwidrig' },
   { stem: 'überteuert', replacement: 'über dem Referenzband liegend', label: 'überteuert' },
   { stem: 'ueberteuert', replacement: 'über dem Referenzband liegend', label: 'überteuert' },
   { stem: 'zu teuer', replacement: 'über dem Referenzband', label: 'zu teuer' },
+  { stem: 'wucher', replacement: 'deutlich über dem Referenzband liegend', label: 'Wucher' },
+  { stem: 'strafbar', replacement: 'von der gesetzlichen Regelung abweichend', label: 'strafbar' },
+  { stem: 'illegal', replacement: 'von der gesetzlichen Regelung abweichend', label: 'illegal' },
+  // Regel 2: keine Absichtszuschreibung gegenüber dem Rechnungssteller. Das
+  // Wort fällt weg, der Satz bleibt stehen — die Feststellung dahinter ist ja
+  // in Ordnung, nur das unterstellte Motiv nicht.
+  { stem: 'vorsätzlich', replacement: '', label: 'vorsätzlich' },
+  { stem: 'absichtlich', replacement: '', label: 'absichtlich' },
+  { stem: 'bewusst falsch', replacement: 'abweichend', label: 'bewusst falsch' },
+  { stem: 'manipuliert', replacement: 'abweichend erfasst', label: 'manipuliert' },
+  // Hier hilft keine Ersetzung: Wer „Betrug" schreibt, macht einen Vorwurf,
+  // und der lässt sich nicht in eine Feststellung umbiegen. Der Satz fällt.
   { stem: 'betrug', replacement: null, label: 'Betrug' },
   { stem: 'betrüger', replacement: null, label: 'Betrüger' },
   { stem: 'unseriös', replacement: null, label: 'unseriös' },
   { stem: 'unserioes', replacement: null, label: 'unseriös' },
   { stem: 'abzocke', replacement: null, label: 'Abzocke' },
-  { stem: 'wucher', replacement: null, label: 'Wucher' },
-  { stem: 'sittenwidrig', replacement: null, label: 'sittenwidrig' },
-  { stem: 'strafbar', replacement: null, label: 'strafbar' },
-  { stem: 'illegal', replacement: null, label: 'illegal' },
-  // Regel 2: keine Absichtszuschreibung gegenüber dem Rechnungssteller.
   { stem: 'täusch', replacement: null, label: 'Täuschung' },
   { stem: 'getäuscht', replacement: null, label: 'getäuscht' },
-  { stem: 'vorsätzlich', replacement: null, label: 'vorsätzlich' },
-  { stem: 'absichtlich', replacement: null, label: 'absichtlich' },
-  { stem: 'manipuliert', replacement: null, label: 'manipuliert' },
 ];
 
 function patternFor(stem: string): RegExp {
@@ -82,8 +87,14 @@ function splitSentences(text: string): string[] {
 }
 
 /**
- * Wortfilter auf einem Textfeld. Ersetzbare Begriffe werden ersetzt, nicht
- * ersetzbare löschen den Satz, in dem sie stehen.
+ * Wortfilter auf einem Textfeld.
+ *
+ * Ersetzen geht vor Löschen. Ein gelöschter Satz reißt ein Loch in den
+ * Bericht, und der Kunde sieht nur, dass etwas fehlt — nicht, was. Deshalb
+ * hat jede Regel eine Ersetzung, wo es eine saubere gibt: `''` streicht nur
+ * das Wort und lässt den Satz stehen, ein Text ersetzt es. Erst `null`
+ * entfernt den ganzen Satz, und das ist auf die Fälle beschränkt, in denen
+ * der Satz ein Vorwurf ist und nicht eine Feststellung mit falschem Wort.
  */
 function filterWords(
   text: string,
@@ -94,17 +105,21 @@ function filterWords(
   let working = text;
 
   for (const rule of rules) {
-    if (!rule.replacement) continue;
+    // Nur `null` löscht. `''` ist eine Ersetzung und muss hier durchkommen.
+    if (rule.replacement === null) continue;
     const pattern = patternFor(rule.stem);
     if (pattern.test(working)) {
       working = working.replace(patternFor(rule.stem), rule.replacement);
+      // Ersetzungen mit leerem String hinterlassen doppelte Leerzeichen und
+      // Leerzeichen vor Satzzeichen.
+      working = working.replace(/\s{2,}/g, ' ').replace(/\s+([,.;:!?])/g, '$1').trim();
       log.push(`Regel 1: „${rule.label}" in ${where} ersetzt.`);
     }
   }
 
   const kept = splitSentences(working).filter((sentence) => {
     for (const rule of rules) {
-      if (rule.replacement) continue;
+      if (rule.replacement !== null) continue;
       if (patternFor(rule.stem).test(sentence)) {
         log.push(`Regel 1: Satz mit „${rule.label}" in ${where} entfernt.`);
         return false;
@@ -121,9 +136,37 @@ function clean(value: unknown): string {
   return value.replace(/\s+/g, ' ').trim();
 }
 
-function asSeverity(value: unknown, fallback: Severity): Severity {
-  return value === 'info' || value === 'warn' || value === 'error' ? value : fallback;
+const SEVERITY_RANK: Record<Severity, number> = { info: 0, warn: 1, error: 2 };
+
+/**
+ * Schweregrad. Der Katalog gibt die Obergrenze vor.
+ *
+ * Nach unten darf das Modell abweichen — es sieht den Einzelfall, und eine
+ * fehlende Angabe kann in einem Dokument nebensächlich sein, in dem anderen
+ * nicht. Nach oben nicht: Sonst steht im Bericht ein Schweregrad, den der
+ * öffentliche Prüfkatalog nicht hergibt, und der Katalog ist das, was der
+ * Kunde vor dem Hochladen gesehen hat.
+ */
+function severityWithin(value: unknown, cap: Severity, log: string[], checkId: string): Severity {
+  if (value !== 'info' && value !== 'warn' && value !== 'error') return cap;
+  if (SEVERITY_RANK[value] > SEVERITY_RANK[cap]) {
+    log.push(`${checkId}: Schweregrad „${value}" auf die Katalogvorgabe „${cap}" zurückgesetzt.`);
+    return cap;
+  }
+  return value;
 }
+
+/**
+ * Obergrenze für die Anzahl der Feststellungen, wenn die Nische keine eigene
+ * setzt. Sie steht auch im System-Prompt (lib/prompt.ts) — hier ist die
+ * Durchsetzung. Der Grund ist nicht Lesbarkeit: Ein Bericht, der über die
+ * Grenze läuft, läuft in `max_tokens`, und dann schlägt der ganze Vorgang
+ * fehl statt nur lang zu werden.
+ */
+export const DEFAULT_MAX_FINDINGS = 25;
+
+/** Anteil, ab dem Ankerwert und gelesene Summe als Abweichung gelten. */
+const ANCHOR_TOLERANCE = 0.02;
 
 /** Handlung: eine Handlung, kein Aufzählungsblock. */
 function normalizeAction(text: string): string {
@@ -131,6 +174,27 @@ function normalizeAction(text: string): string {
     .replace(/^\s*[-•*\d]+[.)]?\s*/gm, '')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+/**
+ * Obergrenze durchsetzen. Läuft nach der Sortierung, also fallen die
+ * leichtesten Funde weg und nicht die zufällig letzten. Der Abschnitt landet
+ * im Protokoll: Ein Bericht, dem still etwas fehlt, ist bei einer Reklamation
+ * nicht erklärbar.
+ */
+function capFindings(findings: Finding[], niche: NicheConfig, log: string[]): void {
+  const max = niche.ai.maxFindings ?? DEFAULT_MAX_FINDINGS;
+  if (findings.length <= max) return;
+
+  const dropped = findings.length - max;
+  findings.length = max;
+  log.push(
+    `Obergrenze: ${dropped} Feststellungen über die zugesagten ${max} hinaus entfernt. Entfernt wurden die leichtesten, sortiert nach Schwere und Betrag.`,
+  );
+}
+
+function euro(value: number): string {
+  return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value);
 }
 
 /** Wirtschaftlich überschneidende Funde erkennen wir an derselben Fundstelle. */
@@ -200,6 +264,32 @@ export function sanitize({
     log.push('Regel 4: keine belastbare Dokumentsumme vorhanden — alle Euro-Schätzungen entfernt.');
   }
 
+  // Nutzereingabe schlägt Modell-Lesung. Weicht beides voneinander ab, wird
+  // die Abweichung genannt statt stillschweigend wegkorrigiert. Beide Zahlen
+  // können richtig sein — Brutto gegen Netto, Schlussrechnung gegen
+  // Abschlagsrechnung — und die Frage, welche gemeint ist, gehört zum Kunden.
+  let anchorNote: string | undefined;
+  const readEuro =
+    typeof raw.documentTotalEuro === 'number' && raw.documentTotalEuro > 0 ? raw.documentTotalEuro : null;
+
+  if (anchorCents !== null && anchorCents > 0 && readEuro !== null) {
+    const anchorEuro = anchorCents / 100;
+    const deviation = Math.abs(readEuro - anchorEuro) / anchorEuro;
+
+    if (deviation > ANCHOR_TOLERANCE) {
+      const percent = Math.round(deviation * 100);
+      anchorNote = [
+        `Sie haben ${euro(anchorEuro)} als Endsumme angegeben, im Dokument gelesen wurde ${euro(readEuro)}.`,
+        `Das sind ${percent} % Unterschied. Gerechnet wurde mit Ihrer Angabe.`,
+        'Beide Zahlen können richtig sein, etwa bei Brutto und Netto oder bei einer Rechnung mit Abschlägen.',
+        'Bitte prüfen Sie, welche der beiden die Endsumme Ihrer Rechnung ist.',
+      ].join(' ');
+      log.push(
+        `Anker: Angabe ${anchorEuro.toFixed(2)} €, Modell-Lesung ${readEuro.toFixed(2)} €, Abweichung ${percent} %. Gerechnet wurde mit der Angabe.`,
+      );
+    }
+  }
+
   const findings: Finding[] = [];
 
   for (const rawFinding of raw.findings) {
@@ -235,7 +325,7 @@ export function sanitize({
       checkId,
       label: check.label,
       category: check.category,
-      severity: asSeverity(rawFinding.severity, check.severity),
+      severity: severityWithin(rawFinding.severity, check.severity, log, checkId),
       observation,
       documentRef,
       action,
@@ -296,6 +386,8 @@ export function sanitize({
     return (b.euroImpact?.[1] ?? 0) - (a.euroImpact?.[1] ?? 0);
   });
 
+  capFindings(findings, niche, log);
+
   // Regel 4: keine Addition über überschneidende Posten. Bei gleicher
   // Fundstelle zählt nur der weiter reichende Fund in die Summe.
   let total: [number, number] | null = null;
@@ -332,7 +424,7 @@ export function sanitize({
     }
   }
 
-  return { ...base, findings, euroTotal: total, sanitizeLog: log };
+  return { ...base, findings, euroTotal: total, anchorNote, sanitizeLog: log };
 }
 
 /**
@@ -513,6 +605,8 @@ export function sanitizeComputed({
     if (order[a.severity] !== order[b.severity]) return order[a.severity] - order[b.severity];
     return (b.euroImpact?.[1] ?? 0) - (a.euroImpact?.[1] ?? 0);
   });
+
+  capFindings(findings, niche, log);
 
   log.push(
     'Rechennische: Euro-Beträge stammen aus geprüftem Rechencode und werden nicht gedeckelt.',

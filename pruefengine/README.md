@@ -111,12 +111,15 @@ app/api/report/[id]/                  PDF-Auslieferung, nur für bezahlte Berich
 lib/resolveNiche.ts                   Slug → Config, inaktive Nische = 404
 lib/parse.ts                          Eingangsprüfung: Typ, Größe, Seitenzahl
 lib/prompt.ts                         System-Prompt aus dem Katalog erzeugen
-lib/analyze.ts                        Modellaufruf mit erzwungenem tool_use
+lib/analyze.ts                        Modellaufruf: streamt, erzwingt tool_use
+lib/usage.ts                          Token-Zeile und Kostenschätzung je Aufruf
 lib/sanitize.ts                       Wortfilter, Euro-Deckelung, harter Abbruch
 lib/report.ts                         PDF mit Katalogversion
 lib/events.ts                         vier Funnel-Ereignisse, serverseitig
 lib/store.ts                          Ergebnisse mit TTL aus der Config
-lib/ratelimit.ts                      Rate-Limit auf der Analyse-Route
+lib/ratelimit.ts / lib/ip.ts          Rate-Limit, Ausnahmen über Präfix-Vergleich
+lib/http.ts                           Client liest erst Text, dann JSON
+lib/mail.ts / lib/mailqueue.ts        § 312f-Bestätigung, Bericht, Nachversand
 lib/legal.ts / lib/waiver.ts          Widerrufsverzicht, wortgleich geprüft
 lib/blog.ts                           Silo aus content/blog/<slug>/
 
@@ -194,15 +197,35 @@ keinen Speicher.
 ### Prüfungen vor jedem Deploy
 
 ```bash
-npm run check          # typecheck + Nischen-Prüfung + beide Rauchtests
+npm run check          # typecheck + Nischen-Prüfung + alle Tests
 ```
 
 - `check:niches` — vollständige Config, Grundlage bei jedem Prüfpunkt, keine
-  doppelten IDs, `hideEuroTotal === true`, `maxTokens >= 8000`, Beispielansicht
-  verweist nur auf existierende Prüfpunkte, keine Platzhalter mehr.
+  doppelten IDs, `hideEuroTotal === true`, `maxTokens >= 8000`, gültiges
+  `ai.effort`, Beispielansicht verweist nur auf existierende Prüfpunkte, kein
+  Ratgeberartikel greift dasselbe Keyword an wie die Landing, keine Platzhalter
+  mehr.
 - `smoke:sanitize` — die Sanitizing-Regeln gegen bewusst regelwidrige
-  Modellausgaben.
+  Modellausgaben: Wortfilter, Euro-Deckelung, Fundobergrenze, Severity nur nach
+  unten, Anker-Abweichung.
 - `smoke:report` — PDF-Erzeugung, prüft die pdfkit-Fallstricke.
+- `test:vfe` — 53 Prüfungen gegen den Aktiv-Passiv-Rechner.
+- `test:ip` — Präfix-Vergleich der Rate-Limit-Ausnahmen.
+
+### Werkzeuge außerhalb des Deploy-Gates
+
+```bash
+npm run measure:effort -- handwerkerrechnung ./rechnung.pdf 1184,05 high medium
+npm run mail:resend                # zeigt fehlgeschlagene Mails
+npm run mail:resend -- --go        # sendet sie nach
+```
+
+`measure:effort` fährt dasselbe Dokument auf zwei Denkstufen und stellt Token,
+Laufzeit, Kosten und die getroffenen Prüfkategorien nebeneinander. Beide Läufe
+kosten echtes Geld. Der Punkt ist die letzte Spalte: Eine niedrigere Stufe
+halbiert die Kosten, kann aber eine ganze Prüfkategorie kosten. Fällt eine weg,
+gehört sie im Prompt zum Pflichtbereich erklärt und im Code abgesichert — und
+danach wird erneut gemessen.
 
 ---
 
@@ -221,8 +244,10 @@ npm run check          # typecheck + Nischen-Prüfung + beide Rauchtests
    `checkout.session.completed`. Das Signing Secret (`whsec_…`) als
    `STRIPE_WEBHOOK_SECRET` eintragen.
 6. **Stripes eigene Quittung abschalten**: *Settings → Payments → Customer
-   emails → Successful payments* deaktivieren. Sonst bekommt der Kunde zwei
-   Mails aus zwei Systemen, von denen nur eine den Bericht enthält.
+   emails → Successful payments* deaktivieren. Die Vertragsbestätigung nach
+   § 312f BGB verschickt die Engine selbst, mit Vertragsinhalt, Preis und dem
+   Wortlaut der Widerrufserklärung. Stripes Quittung enthält davon nichts und
+   käme zusätzlich.
 7. **Resend**: Absenderdomain verifizieren (DKIM- und SPF-Einträge bei INWX
    setzen), dann `MAIL_FROM` auf diese Domain stellen.
 8. **Vercel Analytics** im Projekt aktivieren. Die vier Funnel-Ereignisse
@@ -311,6 +336,14 @@ Nische. Auf Prompt-Befolgung allein verlässt sich die Engine nicht:
 | 4 euroImpact nur mit Grundlage | ja | Deckelung auf 40 % je Fund, 80 % in Summe; keine Addition über dieselbe Fundstelle |
 | 5 „nicht beurteilbar" | ja | harter Abbruch vor dem Bezahl-Gate, `canPurchase()` |
 | 6 nur Katalogpunkte | ja | Fund mit unbekannter ID wird verworfen |
+| 7 jede Feststellung belegt | ja | Fund ohne `documentRef` wird verworfen |
+| 8 nichts gefunden ist ein Ergebnis | ja | ohne Fund kein Kaufangebot |
+| 9 Obergrenze der Fundanzahl | ja, mit der Zahl aus `ai.maxFindings` | `capFindings()` kürzt nach der Sortierung, protokolliert die Kürzung |
+
+Nicht als Regel formuliert, aber genauso erzwungen: `label`, `category` und
+`basis` kommen immer aus dem Katalog, nie aus der Modellantwort. Der
+Schweregrad darf nur nach unten von der Katalogvorgabe abweichen — sonst stünde
+im Bericht eine Einstufung, die der öffentliche Katalog nicht hergibt.
 
 Das Ausgabeschema wird über `tool_use` erzwungen: Tool-Definition mit
 JSON-Schema, `tool_choice` fest auf dieses Tool. Es gibt bewusst **keinen**
@@ -343,6 +376,33 @@ Auf jedem PaymentIntent stehen `metadata.niche` und `metadata.experiment`.
 **Zielgröße: `paid / upload_started` je Nische.** Ohne diese Zahl aus vier
 Wochen Bestandsbetrieb ist jede weitere Nische eine Wette.
 
+### Token und Kosten
+
+Jeder Modellaufruf schreibt eine Zeile:
+
+```json
+{"type":"model_usage","niche":"handwerkerrechnung","model":"claude-opus-5",
+ "effort":"high","stopReason":"tool_use","durationMs":41230,"docs":1,"pages":3,
+ "input":4384,"output":22052,"cacheRead":0,"cacheWrite":3910,
+ "outputShare":0.83,"costUsd":0.5977}
+```
+
+Die Token-Zahlen im Beispiel stammen aus dem Livegang des Bestandsprodukts.
+Für diese Engine gibt es noch keinen gemessenen Lauf.
+
+`outputShare` ist die Kennzahl, auf die es ankommt. Denk-Token zählen als
+Output, und Output kostet rund das Fünffache von Input. Steht der Wert bei 0,8,
+hängt der Aufruf am Denken und nicht am Dokument — dann ist `ai.effort` der
+Hebel, nicht das Dateiformat.
+
+Die Preise für die Schätzung stehen in `lib/usage.ts` mit Datum. Ein Modell,
+das dort nicht steht, bekommt `costUsd: null` statt einer geratenen Zahl.
+
+Nach jedem Kauf gehen zwei Mails raus: erst die Vertragsbestätigung nach
+§ 312f BGB, dann der Bericht. Schlägt eine fehl, steht eine Zeile
+`type: "mail_failed"` in den Logs und der Vorgang in der Warteschlange.
+`npm run mail:resend` zeigt sie, `-- --go` sendet nach.
+
 ---
 
 ## Bekannte Fallstricke — und wo sie hier adressiert sind
@@ -354,15 +414,26 @@ Wochen Bestandsbetrieb ist jede weitere Nische eine Wette.
 | `flushPages()` vor `end()` | `buildReportPdf()` |
 | `ignoreDuringBuilds` / `ignoreBuildErrors` | `next.config.mjs` |
 | `max_tokens` mindestens 8000 | `lib/analyze.ts` erzwingt das Minimum, `check:niches` prüft die Config |
+| Nicht gestreamte Requests laufen in HTTP-Timeouts | `callTool()` streamt immer und wartet auf `finalMessage()` |
+| `stop_reason` nicht ausgewertet, Fehlersuche an der falschen Stelle | `callTool()` übersetzt `max_tokens`, `refusal`, `model_context_window_exceeded` und `pause_turn` in verständliche Meldungen |
+| Prompt-Cache trifft nie, weil der System-Prompt pro Fall gebaut wird | System-Prompt kommt aus dem Katalog und ist je Nische konstant, `cache_control` sitzt dahinter; alles Fallspezifische steht im User-Turn |
+| Kostendiskussion ohne Zahlen | `lib/usage.ts` schreibt je Aufruf eine Zeile `type: "model_usage"` mit Input, Output, Cache-Read, Cache-Write und geschätzten Kosten |
+| Zu langer Bericht läuft in `max_tokens` | Obergrenze steht in Regel 9 des Prompts **und** in `capFindings()` |
 | Werte in `.env.local`, nicht `.env.example` | `.env.example` enthält nur Namen |
+| `package-lock.json` auf macOS neu erzeugt, Linux-Build bricht ab | Lockfile hier unter Linux erzeugt. Neu bauen nur mit `rm -f package-lock.json && npm install --package-lock-only --os=linux --cpu=x64` |
 | keine doppelten A-Records | Abschnitt „DNS bei INWX" |
 | Secret Key statt Publishable Key | `getStripe()` bricht bei `pk_…` mit klarer Meldung ab |
 | Stripes eigene Quittung abschalten | Schritt 6 im Deployment |
-| Rate-Limiting ab Tag 1, eigene IP ausnehmen | `lib/ratelimit.ts`, `RATE_LIMIT_ALLOWLIST_IPS` |
+| Rate-Limiting ab Tag 1, eigene Verbindung ausnehmen | `lib/ratelimit.ts`, Präfix-Vergleich in `lib/ip.ts` — eine exakt eingetragene IPv6-Adresse passt nach zwei Tagen nicht mehr |
+| Client ruft blind `res.json()` auf, Nutzer sieht „Unexpected token 'A'" | `readJson()` in `lib/http.ts` liest erst Text, parst dann |
+| Leerer Upload durch verschobene Datei | `parseUploads()` bricht bei 0 Bytes ab |
+| § 312f-Bestätigung fehlt, Widerrufsrecht erlischt nicht | `sendConfirmationMail()` läuft vor dem Berichtsversand; Fehlversand landet in `lib/mailqueue.ts` und geht mit `npm run mail:resend` raus |
+| Ratgeberartikel greift dasselbe Keyword an wie die Geldseite | `check:niches` vergleicht die Kernphrase der H1 gegen jeden Artikeltitel |
 
 ---
 
 ## Weiterführend
 
+- [`docs/briefing-umsetzung.md`](docs/briefing-umsetzung.md) — Die Lehren aus dem Livegang, Punkt für Punkt mit Fundort im Code
 - [`docs/nische-3-anleitung.md`](docs/nische-3-anleitung.md) — So legst du Nische 3 an
 - [`docs/gate-0.md`](docs/gate-0.md) — Acht Fragen vor jeder neuen Nische

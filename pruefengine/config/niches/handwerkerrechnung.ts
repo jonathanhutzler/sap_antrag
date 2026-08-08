@@ -349,7 +349,7 @@ export const handwerkerrechnung: NicheConfig = {
       },
       {
         q: 'Kann ich widerrufen?',
-        a: 'Grundsätzlich haben Sie 14 Tage. Weil der Bericht sofort bereitsteht, müssen Sie beim Kauf ankreuzen, dass wir vorher anfangen dürfen, und bestätigen, dass Sie damit Ihr Widerrufsrecht verlieren (§ 356 Abs. 5 BGB). Diese Erklärung protokollieren wir im Wortlaut mit Zeitstempel.',
+        a: 'Grundsätzlich haben Sie 14 Tage. Weil der Bericht sofort bereitsteht, müssen Sie beim Kauf ankreuzen, dass wir vorher anfangen dürfen, und bestätigen, dass Ihr Widerrufsrecht damit erlischt (§ 356 Abs. 5 BGB). Diese Erklärung protokollieren wir im Wortlaut mit Zeitstempel.',
       },
     ],
   },

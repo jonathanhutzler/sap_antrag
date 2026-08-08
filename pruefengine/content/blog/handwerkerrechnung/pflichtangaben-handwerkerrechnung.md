@@ -2,7 +2,7 @@
 title: Diese Angaben müssen auf jeder Handwerkerrechnung stehen
 description: Die Pflichtangaben nach § 14 UStG zum Abhaken, plus die zehnte Angabe, die nur bei Arbeiten am Grundstück dazukommt.
 date: 2026-07-02
-related: [handwerkerrechnung-pruefen-lassen, arbeitskosten-getrennt-ausweisen, leistungsbeschreibung-rechnung]
+related: [handwerkerrechnung-anwalt-sachverstaendiger-kosten, arbeitskosten-getrennt-ausweisen, leistungsbeschreibung-rechnung]
 ---
 
 Eine Rechnung an eine Privatperson muss bestimmte Angaben enthalten. Sie stehen in § 14 Abs. 4 UStG. Das ist der einzige Teil der Rechnungsprüfung, den Sie komplett abhaken können, ohne etwas auslegen zu müssen.

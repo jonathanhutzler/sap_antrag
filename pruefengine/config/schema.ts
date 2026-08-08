@@ -135,6 +135,27 @@ export interface NicheConfig {
       input_schema: Record<string, unknown>;
     };
     maxTokens: number;
+    /**
+     * Denkaufwand des Modells. Der wichtigste Kosten- und Zeitregler, weil
+     * Denk-Token als Output zählen und Output rund fünfmal so teuer ist wie
+     * Input.
+     *
+     * Ohne Angabe gilt `high` — der Standard der API. Vor jeder Senkung eine
+     * Messung: `npm run measure:effort` fährt dasselbe Dokument auf zwei
+     * Stufen und zeigt neben Token und Laufzeit, welche Prüfkategorien
+     * wegfallen. Fällt eine Kategorie weg, ist die Antwort nicht
+     * zurückdrehen, sondern die Kategorie im Prompt zum Pflichtbereich
+     * erklären und im Code absichern.
+     */
+    effort?: 'low' | 'medium' | 'high' | 'xhigh' | 'max';
+    /**
+     * Obergrenze für die Anzahl der Feststellungen. Steht im Prompt und wird
+     * in `sanitize.ts` erzwungen. Grund ist nicht Übersichtlichkeit: Ein zu
+     * langer Bericht läuft in `max_tokens`, und dann schlägt der ganze
+     * Vorgang fehl statt nur lang zu werden. Ohne Angabe gilt der Wert aus
+     * lib/sanitize.ts.
+     */
+    maxFindings?: number;
   };
 
   /**
@@ -309,6 +330,12 @@ export interface AnalysisResult {
   notAssessableReason?: string;
   docSummary: string;
   anchorValueCents: number | null;
+  /**
+   * Hinweis, wenn die Angabe des Nutzers und die vom Modell gelesene Summe
+   * auseinandergehen. Gerechnet wird immer mit der Angabe des Nutzers; die
+   * Abweichung wird genannt und nicht stillschweigend wegkorrigiert.
+   */
+  anchorNote?: string;
   context: Record<string, string>;
   findings: Finding[];
   euroTotal: [number, number] | null;

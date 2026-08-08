@@ -2,7 +2,7 @@
 title: Handwerkerrechnung bar bezahlt — was das steuerlich bedeutet
 description: Der Abzug nach § 35a EStG setzt eine unbare Zahlung voraus. Warum eine Quittung nicht reicht und was noch geht, wenn schon bar gezahlt wurde.
 date: 2026-05-06
-related: [arbeitskosten-getrennt-ausweisen, pflichtangaben-handwerkerrechnung, handwerkerrechnung-pruefen-lassen]
+related: [arbeitskosten-getrennt-ausweisen, pflichtangaben-handwerkerrechnung, handwerkerrechnung-anwalt-sachverstaendiger-kosten]
 ---
 
 Der Monteur ist fertig, hat die Rechnung dabei und nimmt das Geld gleich mit. Quittung gibt es auch. Für die Steuerermäßigung nach § 35a EStG ist damit trotzdem nichts zu holen.

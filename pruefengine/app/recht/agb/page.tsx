@@ -107,6 +107,11 @@ export default function AgbPage() {
           Ergibt die Prüfung, dass das Dokument nicht beurteilbar ist, oder wird keine Feststellung getroffen, wird
           kein kostenpflichtiger Bericht angeboten. Ein Vertrag kommt in diesem Fall nicht zustande.
         </p>
+        <p>
+          Nach Vertragsschluss erhält der Besteller unverzüglich eine Bestätigung des Vertrages in Textform per
+          E-Mail (§ 312f BGB). Sie enthält den Vertragsinhalt, den Preis, die Vorgangsnummer und den Wortlaut der
+          abgegebenen Erklärung zum Widerrufsrecht.
+        </p>
 
         <h2>§ 5 Preise und Zahlung</h2>
         <p>

@@ -1,4 +1,5 @@
 import type { NicheConfig } from '@/config/schema';
+import { DEFAULT_MAX_FINDINGS } from './sanitize';
 
 /**
  * System-Prompt-Erzeugung.
@@ -94,10 +95,22 @@ export function buildSystemPrompt(niche: NicheConfig): string {
     .map(([category, checks]) => `## ${category}\n\n${checks.map(renderCheck).join('\n\n')}`)
     .join('\n\n');
 
+  // Regel 9 trägt eine Zahl aus der Config und steht deshalb hier statt in
+  // GLOBAL_RULES. Sie wird zusätzlich in lib/sanitize.ts durchgesetzt: Ein
+  // Bericht, der über die Grenze läuft, läuft in max_tokens, und dann kommt
+  // gar kein Ergebnis zurück statt eines langen.
+  const maxFindings = niche.ai.maxFindings ?? DEFAULT_MAX_FINDINGS;
+  const cappingRule = `9. Höchstens ${maxFindings} Feststellungen. Sind es mehr, nimm die
+   ${maxFindings} gewichtigsten und lass den Rest weg. Ein Bericht, der diese
+   Grenze überschreitet, bricht technisch ab und erreicht den Auftraggeber
+   gar nicht.`;
+
   return [
     niche.ai.systemPrompt.trim(),
     '',
     GLOBAL_RULES,
+    '',
+    cappingRule,
     '',
     `PRUEFKATALOG — Version ${niche.catalogue.version}, ${niche.catalogue.checks.length} Prüfpunkte.`,
     'Dieser Katalog ist öffentlich einsehbar. Der Auftraggeber hat ihn vor dem Hochladen gesehen.',

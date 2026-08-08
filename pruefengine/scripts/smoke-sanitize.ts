@@ -9,7 +9,7 @@
  * Aufruf: npm run smoke:sanitize
  */
 import { handwerkerrechnung } from '../config/niches/handwerkerrechnung';
-import { canPurchase, previewFindings, previewStats, sanitize } from '../lib/sanitize';
+import { DEFAULT_MAX_FINDINGS, canPurchase, previewFindings, previewStats, sanitize } from '../lib/sanitize';
 import type { RawAnalysis } from '../lib/analyze';
 
 let failed = 0;
@@ -295,6 +295,147 @@ run('Vorschau — mittelschwerer Fund, nicht der größte', () => {
     'hideEuroTotal ist unveränderlich true',
     handwerkerrechnung.pricing.preview.hideEuroTotal === true,
   );
+});
+
+// ── Ersetzen geht vor Löschen ──────────────────────────────────────────
+run('Wortfilter — Vorwurfswort raus, Satz bleibt', () => {
+  const result = sanitize({
+    ...base,
+    anchorCents: 100000,
+    raw: raw({
+      findings: [
+        {
+          checkId: 'HR-15',
+          severity: 'warn',
+          observation: 'Die Anfahrt wurde absichtlich zweimal berechnet. Beide Fahrten liegen am selben Tag.',
+          documentRef: 'Pos. 4 Anfahrtspauschale',
+          action: 'Bitte erläutern Sie mir die zweite Anfahrt.',
+        },
+      ],
+    }),
+  });
+
+  const observation = result.findings[0]?.observation ?? '';
+  check('Fund bleibt erhalten', result.findings.length === 1);
+  check('„absichtlich" ist weg', !/absichtlich/i.test(observation));
+  check('Der Satz steht noch', /zweimal berechnet/.test(observation));
+  check('Zweiter Satz unangetastet', /Beide Fahrten liegen am selben Tag/.test(observation));
+  check('Keine Doppelleerzeichen', !/ {2}/.test(observation), observation);
+});
+
+// ── Severity nur nach unten ────────────────────────────────────────────
+run('Katalogtreue — Schweregrad darf nur nach unten', () => {
+  // HR-06 steht im Katalog auf „error".
+  const katalogSeverity = handwerkerrechnung.catalogue.checks.find((c) => c.id === 'HR-06')?.severity;
+
+  const runter = sanitize({
+    ...base,
+    anchorCents: 100000,
+    raw: raw({
+      findings: [
+        {
+          checkId: 'HR-06',
+          severity: 'info',
+          observation: 'Position 3 lautet „Reparaturarbeiten".',
+          documentRef: 'Pos. 3 Reparaturarbeiten',
+          action: 'Bitte schlüsseln Sie Position 3 auf.',
+        },
+      ],
+    }),
+  });
+
+  // HR-15 steht im Katalog auf „warn"; „error" wäre eine Anhebung.
+  const hoch = sanitize({
+    ...base,
+    anchorCents: 100000,
+    raw: raw({
+      findings: [
+        {
+          checkId: 'HR-15',
+          severity: 'error',
+          observation: 'Der Stundensatz liegt über dem Referenzband.',
+          documentRef: 'Pos. 1 Monteurstunden',
+          action: 'Bitte erläutern Sie mir den Stundensatz.',
+        },
+      ],
+    }),
+  });
+
+  const katalogHr15 = handwerkerrechnung.catalogue.checks.find((c) => c.id === 'HR-15')?.severity;
+
+  check('Katalog HR-06 steht auf error', katalogSeverity === 'error');
+  check('Abstufung nach unten bleibt', runter.findings[0]?.severity === 'info');
+  check('Anhebung wird zurückgesetzt', hoch.findings[0]?.severity === katalogHr15, `war ${hoch.findings[0]?.severity}`);
+  check('Rücksetzung protokolliert', hoch.sanitizeLog.some((l) => l.includes('zurückgesetzt')));
+});
+
+// ── Obergrenze für die Anzahl der Funde ────────────────────────────────
+run('Obergrenze — mehr Funde als zugesagt', () => {
+  const max = handwerkerrechnung.ai.maxFindings ?? DEFAULT_MAX_FINDINGS;
+  const alle = handwerkerrechnung.catalogue.checks.slice(0, max + 5);
+
+  const result = sanitize({
+    ...base,
+    anchorCents: 100000,
+    raw: raw({
+      findings: alle.map((check, index) => ({
+        checkId: check.id,
+        // Absteigende Schwere, damit die Sortierung etwas zu tun hat.
+        severity: index < 3 ? 'error' : index < 10 ? 'warn' : 'info',
+        observation: `Feststellung zu ${check.id}.`,
+        documentRef: `Pos. ${index + 1}`,
+        action: `Bitte erläutern Sie mir Position ${index + 1}.`,
+      })),
+    }),
+  });
+
+  // Der Schweregrad im Ergebnis ist der aus dem Katalog, nicht der oben
+  // gesetzte: severityWithin lässt nur Abstufungen nach unten durch. Geprüft
+  // wird deshalb die Reihenfolge, nicht ein einzelner Wert.
+  const rang = { error: 0, warn: 1, info: 2 } as const;
+  const sortiert = result.findings.every(
+    (f, i) => i === 0 || rang[result.findings[i - 1].severity] <= rang[f.severity],
+  );
+
+  check('Auf die Obergrenze gekürzt', result.findings.length === max, `waren ${result.findings.length}`);
+  check('Kürzung protokolliert', result.sanitizeLog.some((l) => l.startsWith('Obergrenze')));
+  check('Nach Schwere sortiert, schwerste zuerst', sortiert);
+  check(
+    'Kein gekürzter Fund ist schwerer als ein behaltener',
+    rang[result.findings[result.findings.length - 1].severity] >= rang[result.findings[0].severity],
+  );
+});
+
+// ── Nutzereingabe schlägt Modell-Lesung ────────────────────────────────
+run('Anker — Abweichung wird genannt, nicht wegkorrigiert', () => {
+  const abweichend = sanitize({
+    ...base,
+    anchorCents: 118405, // 1.184,05 € vom Nutzer abgetippt
+    raw: raw({
+      documentTotalEuro: 995.1, // das Modell hat etwas anderes gelesen
+      findings: [
+        {
+          checkId: 'HR-15',
+          severity: 'warn',
+          observation: 'Der Stundensatz liegt über dem Referenzband.',
+          documentRef: 'Pos. 1 Monteurstunden',
+          action: 'Bitte erläutern Sie mir den Stundensatz.',
+        },
+      ],
+    }),
+  });
+
+  const gleich = sanitize({
+    ...base,
+    anchorCents: 118405,
+    raw: raw({ documentTotalEuro: 1184.05, findings: [] }),
+  });
+
+  check('Hinweis gesetzt', typeof abweichend.anchorNote === 'string' && abweichend.anchorNote.length > 0);
+  check('Beide Zahlen stehen darin', /1\.184,05/.test(abweichend.anchorNote ?? '') && /995,10/.test(abweichend.anchorNote ?? ''));
+  check('Ankerwert bleibt unverändert', abweichend.anchorValueCents === 118405);
+  check('Abweichung protokolliert', abweichend.sanitizeLog.some((l) => l.startsWith('Anker:')));
+  check('Kein Hinweis ohne Abweichung', gleich.anchorNote === undefined);
 });
 
 console.log('');
