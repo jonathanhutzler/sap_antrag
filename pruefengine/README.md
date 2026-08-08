@@ -450,6 +450,7 @@ Nach jedem Kauf gehen zwei Mails raus: erst die Vertragsbestätigung nach
 
 ## Weiterführend
 
+- [`docs/livegang.md`](docs/livegang.md) — Reihenfolge für den ersten Deploy, abhakbar
 - [`docs/nischen-pipeline.md`](docs/nischen-pipeline.md) — Die elf Nischen, was jeder bis zum Livegang fehlt, in welcher Reihenfolge
 - [`docs/briefing-umsetzung.md`](docs/briefing-umsetzung.md) — Die Lehren aus dem Livegang, Punkt für Punkt mit Fundort im Code
 - [`docs/nische-3-anleitung.md`](docs/nische-3-anleitung.md) — So legst du Nische 3 an

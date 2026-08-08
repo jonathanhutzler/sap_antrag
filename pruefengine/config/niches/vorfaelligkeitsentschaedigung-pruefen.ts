@@ -16,7 +16,12 @@ import { catalogue } from '../catalogues/vorfaelligkeitsentschaedigung-pruefen.2
  */
 export const vorfaelligkeitsentschaedigung: NicheConfig = {
   slug: 'vorfaelligkeitsentschaedigung-pruefen',
-  active: true,
+  // Auf false gesetzt für den ersten Livegang. Grund steht in legal.blockers:
+  // Der anwaltliche Review fehlt, und die Zinsreihe ist nicht verifiziert.
+  // Eine Rechennische mit Platzhalter-Zinsen würde fünfstellige Beträge
+  // ausrechnen, die auf erfundenen Daten beruhen. Sobald beides erledigt ist,
+  // ist das eine Zeile zurück.
+  active: false,
   aliasDomains: [],
 
   brand: {
