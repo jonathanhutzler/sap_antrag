@@ -1,4 +1,5 @@
 import type { NicheConfig } from '../schema';
+import { documentOutputTool } from '../output-tool';
 import { catalogue } from '../catalogues/handwerkerrechnung.2026-08-01';
 
 /**
@@ -114,97 +115,12 @@ export const handwerkerrechnung: NicheConfig = {
       'Weicht die von dir gelesene Endsumme davon ab, gehe von einem Lesefehler auf deiner Seite aus',
       'und sage das, statt eine Rechendifferenz zu behaupten.',
     ].join('\n'),
-    outputTool: {
-      name: 'pruefbericht',
-      description:
-        'Gib das Ergebnis der Dokumentenprüfung strukturiert zurück. Verwende ausschließlich dieses Werkzeug.',
-      input_schema: {
-        type: 'object',
-        properties: {
-          assessable: {
-            type: 'boolean',
-            description:
-              'false, wenn das Dokument unlesbar, kein Dokument der erwarteten Art oder inhaltlich zu dünn für eine Prüfung ist. Dann keine Funde ausgeben.',
-          },
-          notAssessableReason: {
-            type: 'string',
-            description:
-              'Nur wenn assessable=false: ein bis zwei Sätze, warum nicht geprüft werden konnte. Nichts erfinden.',
-          },
-          detectedDocType: {
-            type: 'string',
-            description:
-              'Was das Dokument tatsächlich ist, z. B. "Handwerkerrechnung", "Kostenvoranschlag", "Mahnung", "unbekannt".',
-          },
-          docSummary: {
-            type: 'string',
-            description:
-              'Zwei bis drei Sätze: Gewerk, Leistungsumfang, Abrechnungsform, Endsumme. Rein beschreibend.',
-          },
-          documentTotalEuro: {
-            type: 'number',
-            description: 'Die im Dokument ausgewiesene Bruttoendsumme in Euro, falls lesbar.',
-          },
-          checkedIds: {
-            type: 'array',
-            items: { type: 'string' },
-            description:
-              'IDs aller Checks aus dem Prüfkatalog, die du am Dokument tatsächlich prüfen konntest.',
-          },
-          findings: {
-            type: 'array',
-            description:
-              'Alle Feststellungen. Jede Feststellung bezieht sich auf genau einen Check aus dem Prüfkatalog. Keine Feststellung ohne Beleg im Dokument.',
-            items: {
-              type: 'object',
-              properties: {
-                checkId: {
-                  type: 'string',
-                  description: 'ID aus dem Prüfkatalog, z. B. "HR-14". Keine eigenen IDs erfinden.',
-                },
-                severity: {
-                  type: 'string',
-                  enum: ['info', 'warn', 'error'],
-                  description:
-                    'Schweregrad dieser konkreten Feststellung. Darf vom Katalogwert abweichen, wenn der Einzelfall es trägt.',
-                },
-                observation: {
-                  type: 'string',
-                  description:
-                    'Was im Dokument steht oder fehlt. Feststellung, keine Bewertung. Zwei bis vier Sätze.',
-                },
-                documentRef: {
-                  type: 'string',
-                  description:
-                    'Wörtliches Zitat oder Positionsbezeichnung aus dem Dokument, an der die Feststellung hängt.',
-                },
-                action: {
-                  type: 'string',
-                  description:
-                    'Genau eine Handlung, formuliert als Satz, den der Auftraggeber wörtlich sagen oder schreiben kann.',
-                },
-                euroImpactLowEuro: {
-                  type: 'number',
-                  description:
-                    'Untergrenze des finanziellen Effekts in Euro. Nur setzen, wenn im Dokument eine Grundlage dafür steht.',
-                },
-                euroImpactHighEuro: {
-                  type: 'number',
-                  description: 'Obergrenze des finanziellen Effekts in Euro. Immer zusammen mit der Untergrenze.',
-                },
-                euroBasis: {
-                  type: 'string',
-                  description:
-                    'Woraus die Spanne rechnerisch folgt, mit den Zahlen aus dem Dokument. Leer lassen, wenn keine Spanne angegeben wird.',
-                },
-              },
-              required: ['checkId', 'severity', 'observation', 'documentRef', 'action'],
-            },
-          },
-        },
-        required: ['assessable', 'detectedDocType', 'docSummary', 'checkedIds', 'findings'],
-      },
-    },
+    outputTool: documentOutputTool({
+      docTypes: ['Handwerkerrechnung', 'Kostenvoranschlag', 'Mahnung'],
+      checkIdPrefix: 'HR',
+      summaryHint: 'Gewerk, Leistungsumfang, Abrechnungsform, Endsumme.',
+      totalHint: 'Die im Dokument ausgewiesene Bruttoendsumme',
+    }),
   },
 
   pricing: {
@@ -359,5 +275,18 @@ export const handwerkerrechnung: NicheConfig = {
     adsBudgetCents: 30000,
     killAfterClicks: 400,
     minPaidConversions: 5,
+  },
+
+  economics: {
+    // Planpreis ist die obere Stufe: Sie ist die, auf die die Vorschau
+    // hinführt, und damit die realistische Bezugsgröße für die Ads-Rechnung.
+    planPriceCents: 3990,
+    conversionBand: [0.03, 0.06],
+    targetCpcCents: [45, 96],
+    marketCpcCents: [150, 300],
+    marketCpcSource: 'Eigene Markteinschätzung 08/2026, nicht aus dem Keyword-Planer verifiziert',
+    channel: 'seo-only',
+    verdict:
+      'Breite Ads wahrscheinlich unprofitabel: 96 Cent vertretbar gegen 1,50 bis 3,00 Euro am Markt. Das Bestandsprodukt läuft, die Zahlen dort schlagen jede Schätzung hier.',
   },
 };

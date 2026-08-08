@@ -4,6 +4,13 @@ import { nische2 } from './niches/nische-2';
 import { vorfaelligkeitsentschaedigung } from './niches/vorfaelligkeitsentschaedigung-pruefen';
 import { leasingMinderwert } from './niches/leasing-minderwert-pruefen';
 import { beihilfebescheid } from './niches/beihilfebescheid-pruefen';
+import { architektenrechnung } from './niches/architektenrechnung-pruefen';
+import { baubeschreibung } from './niches/baubeschreibung-pruefen';
+import { hausgeldabrechnung } from './niches/hausgeldabrechnung-pruefen';
+import { nebenkostenabrechnung } from './niches/nebenkostenabrechnung-pruefen';
+import { pvAngebot } from './niches/pv-angebot-pruefen';
+import { tierarztrechnung } from './niches/tierarztrechnung-pruefen';
+import { arbeitszeugnis } from './niches/arbeitszeugnis-pruefen';
 
 /**
  * Registry aller Nischen. Einziger Ort, an dem eine Nische bekannt gemacht
@@ -13,8 +20,21 @@ import { beihilfebescheid } from './niches/beihilfebescheid-pruefen';
  * Eine neue Nische = ein Import und ein Array-Eintrag. Mehr nicht.
  */
 export const registry: NicheConfig[] = [
+  // Aktiv
   handwerkerrechnung,
   vorfaelligkeitsentschaedigung,
+
+  // Vorbereitet, noch nicht freigeschaltet. Reihenfolge nach der
+  // Wirtschaftlichkeitsrechnung — siehe `npm run economics`.
+  architektenrechnung,
+  baubeschreibung,
+  hausgeldabrechnung,
+  tierarztrechnung,
+  nebenkostenabrechnung,
+  arbeitszeugnis,
+  pvAngebot,
+
+  // Skizzen
   nische2,
   leasingMinderwert,
   beihilfebescheid,

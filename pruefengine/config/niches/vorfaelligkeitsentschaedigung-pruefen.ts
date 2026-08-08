@@ -336,6 +336,19 @@ export const vorfaelligkeitsentschaedigung: NicheConfig = {
     killAfterClicks: 300,
     minPaidConversions: 4,
   },
+
+  economics: {
+    planPriceCents: 9900,
+    // Niedriger angesetzt als bei den Dokumentnischen: Der Anlass ist selten,
+    // die Suchintention oft noch informativ und nicht kaufbereit.
+    conversionBand: [0.02, 0.04],
+    targetCpcCents: [83, 165],
+    marketCpcCents: [200, 500],
+    marketCpcSource: 'Eigene Markteinschätzung 08/2026, nicht aus dem Keyword-Planer verifiziert',
+    channel: 'seo-first',
+    verdict:
+      'Höchster Warenkorb der aktiven Nischen, aber Banken- und Kanzleiwerbung treibt den Klickpreis. Zuerst über die Ratgeberartikel und den kostenlosen Fristrechner.',
+  },
 };
 
 /** Kurzform für die Parameterfelder des Extraktionsschemas. */

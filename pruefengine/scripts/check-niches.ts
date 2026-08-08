@@ -45,12 +45,92 @@ function ok(message: string): void {
   console.log(`  ok      ${message}`);
 }
 
+/**
+ * Wirtschaftlichkeitsdaten. Für aktive Nischen Pflicht, für vorbereitete
+ * geprüft, sobald sie da sind — eine verdrehte Spanne fällt sonst erst auf,
+ * wenn das Budget schon läuft.
+ */
+function checkEconomics(niche: NicheConfig, where: string): void {
+  const e = niche.economics;
+
+  if (!e) {
+    if (niche.active) {
+      fail(where, 'aktiv, aber ohne economics-Block. Ohne Ziel-CPC ist jedes Werbebudget eine Wette.');
+    }
+    return;
+  }
+
+  if (e.planPriceCents <= 0) fail(where, 'economics.planPriceCents muss größer als 0 sein.');
+
+  const bands: Array<[string, [number, number]]> = [
+    ['conversionBand', e.conversionBand],
+    ['targetCpcCents', e.targetCpcCents],
+    ['marketCpcCents', e.marketCpcCents],
+  ];
+  for (const [name, band] of bands) {
+    if (band[0] > band[1]) fail(where, `economics.${name} ist verdreht (${band.join(' bis ')}).`);
+  }
+
+  if (e.conversionBand[0] <= 0 || e.conversionBand[1] > 0.5) {
+    fail(where, `economics.conversionBand liegt außerhalb des Plausiblen (${e.conversionBand.join(' bis ')}).`);
+  }
+  if (!e.marketCpcSource.trim()) {
+    fail(where, 'economics.marketCpcSource ist leer. Eine geschätzte Zahl ohne Herkunft ist eine erfundene Zahl.');
+  }
+  if (!e.verdict.trim()) fail(where, 'economics.verdict ist leer.');
+
+  // Der Planpreis sollte zu einer Preisstufe passen. Weicht er ab, ist das
+  // erlaubt — bei zwei Stufen ist er ein Mischpreis —, aber es soll auffallen.
+  const preise = niche.pricing.tiers.map((t) => t.priceCents);
+  if (preise.length > 0 && (e.planPriceCents < Math.min(...preise) || e.planPriceCents > Math.max(...preise))) {
+    warn(
+      where,
+      `economics.planPriceCents (${(e.planPriceCents / 100).toFixed(2)} €) liegt außerhalb der Preisstufen (${preise
+        .map((p) => (p / 100).toFixed(2))
+        .join(', ')} €).`,
+    );
+  }
+
+  // Ads-Kanal, obwohl der vertretbare Klickpreis nicht einmal den unteren
+  // Marktpreis erreicht: Das ist die Verwechslung, die Geld kostet.
+  if (e.channel === 'ads' && e.targetCpcCents[1] < e.marketCpcCents[0]) {
+    fail(
+      where,
+      `economics.channel steht auf „ads", aber der Ziel-CPC (bis ${(e.targetCpcCents[1] / 100).toFixed(2)} €) liegt unter dem Marktpreis (ab ${(e.marketCpcCents[0] / 100).toFixed(2)} €).`,
+    );
+  }
+  if (niche.active && niche.experiment.adsBudgetCents > 0 && e.channel.startsWith('seo')) {
+    warn(
+      where,
+      `Werbebudget ist gesetzt, economics.channel steht aber auf „${e.channel}". Einer der beiden Werte ist veraltet.`,
+    );
+  }
+}
+
 function checkInactive(niche: NicheConfig): void {
   // Eine inaktive Nische muss nur eines können: nicht erreichbar sein.
   if (niche.catalogue.published && niche.catalogue.checks.length === 0) {
     fail(niche.slug, 'Katalog ist als veröffentlicht markiert, enthält aber keine Prüfpunkte.');
   }
-  ok(`${niche.slug}: inaktiv, nicht erreichbar, nicht in der Sitemap.`);
+
+  // Doppelte IDs und verdrehte Euro-Bänder fallen sonst erst beim
+  // Freischalten auf, und dann unter Zeitdruck.
+  const ids = new Set<string>();
+  for (const check of niche.catalogue.checks) {
+    if (ids.has(check.id)) fail(niche.slug, `Prüfpunkt-ID „${check.id}" ist doppelt vergeben.`);
+    ids.add(check.id);
+    if (!check.basis.trim()) fail(niche.slug, `${check.id} hat keine Grundlage.`);
+    if (check.euroImpact && check.euroImpact[0] > check.euroImpact[1]) {
+      fail(niche.slug, `${check.id}: euroImpact ist verdreht (${check.euroImpact.join(' bis ')}).`);
+    }
+  }
+
+  checkEconomics(niche, niche.slug);
+
+  const offen = niche.legal.blockers?.length ?? 0;
+  ok(
+    `${niche.slug}: inaktiv, nicht erreichbar, nicht in der Sitemap. Katalog mit ${niche.catalogue.checks.length} Prüfpunkten, ${offen} offene Punkte bis zur Freischaltung.`,
+  );
 }
 
 function checkActive(niche: NicheConfig): void {
@@ -168,6 +248,10 @@ function checkActive(niche: NicheConfig): void {
 
   // 5. Recht
   if (niche.legal.dataRetentionHours <= 0) fail(where, 'dataRetentionHours muss größer als 0 sein.');
+
+  // 5b. Wirtschaftlichkeit. Eine aktive Nische ohne diese Zahlen ist eine
+  //     Wette, und der Kill-Switch im Experiment hat nichts, woran er misst.
+  checkEconomics(niche, where);
 
   // 6. Silo
   const blogDir = path.join(process.cwd(), 'content', 'blog', niche.slug);

@@ -31,6 +31,13 @@ zwei eigene Angebote auf denselben Suchbegriffen:
 Produktiv startet die Engine mit der ersten neuen Nische. Welche das wird,
 entscheidet [Gate 0](docs/gate-0.md).
 
+**Elf Nischen liegen in der Registry, zwei sind aktiv.** Sieben weitere sind
+vorbereitet: Config und Prüfkatalog stehen, Texte und Silo fehlen, der
+anwaltliche Review steht aus. Was jeder einzelnen bis zum Livegang fehlt und in
+welcher Reihenfolge das sinnvoll ist, steht in
+[`docs/nischen-pipeline.md`](docs/nischen-pipeline.md); die Zahlen dazu liefert
+`npm run economics`.
+
 ---
 
 ## Die harte Architektur-Regel
@@ -126,6 +133,7 @@ lib/blog.ts                           Silo aus content/blog/<slug>/
 config/schema.ts                      Das Schema, an dem sich alles ausrichtet
 config/registry.ts                    Einziger Ort, an dem eine Nische bekannt wird
 config/site.ts                        Dachdomain und Anbieterdaten
+config/output-tool.ts                 Ausgabeschema, für alle Dokumentnischen gleich
 config/niches/                        eine Datei je Nische
 config/catalogues/                    eine Datei je Katalogversion
 content/blog/<slug>/                  Silo je Nische
@@ -215,10 +223,18 @@ npm run check          # typecheck + Nischen-Prüfung + alle Tests
 ### Werkzeuge außerhalb des Deploy-Gates
 
 ```bash
+npm run economics                  # Ziel-CPC gegen Markt-CPC, je Nische
 npm run measure:effort -- handwerkerrechnung ./rechnung.pdf 1184,05 high medium
 npm run mail:resend                # zeigt fehlgeschlagene Mails
 npm run mail:resend -- --go        # sendet sie nach
 ```
+
+`economics` rechnet aus Preis und angenommener Conversion den vertretbaren
+Klickpreis und stellt ihn dem Marktpreis gegenüber. Die Lage in der vorletzten
+Spalte wird berechnet, nicht abgeschrieben — wer einen Preis ändert und die
+Einschätzung stehen lässt, sieht das hier. Solange die Modellkosten je Prüfung
+geschätzt sind, ist jede Zahl in der Ziel-CPC-Spalte eine Annahme; genau dafür
+gibt es `measure:effort`.
 
 `measure:effort` fährt dasselbe Dokument auf zwei Denkstufen und stellt Token,
 Laufzeit, Kosten und die getroffenen Prüfkategorien nebeneinander. Beide Läufe
@@ -434,6 +450,7 @@ Nach jedem Kauf gehen zwei Mails raus: erst die Vertragsbestätigung nach
 
 ## Weiterführend
 
+- [`docs/nischen-pipeline.md`](docs/nischen-pipeline.md) — Die elf Nischen, was jeder bis zum Livegang fehlt, in welcher Reihenfolge
 - [`docs/briefing-umsetzung.md`](docs/briefing-umsetzung.md) — Die Lehren aus dem Livegang, Punkt für Punkt mit Fundort im Code
 - [`docs/nische-3-anleitung.md`](docs/nische-3-anleitung.md) — So legst du Nische 3 an
 - [`docs/gate-0.md`](docs/gate-0.md) — Acht Fragen vor jeder neuen Nische

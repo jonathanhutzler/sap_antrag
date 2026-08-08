@@ -274,6 +274,41 @@ export interface NicheConfig {
     killAfterClicks: number;
     minPaidConversions: number;
   };
+
+  /**
+   * Wirtschaftlichkeit der Nische, bevor ein Euro Werbebudget fließt.
+   *
+   * Steht hier und nicht in einer Tabelle, weil eine Tabelle veraltet, sobald
+   * jemand den Preis ändert. `npm run economics` rechnet aus diesen Werten den
+   * vertretbaren Klickpreis und stellt ihn dem Marktpreis gegenüber.
+   *
+   * Die Rechnung dahinter: Ein Klick bringt im Schnitt `preis × conversion`
+   * an Umsatz. Davon gehen variable Kosten ab (Zahlungsgebühr, Modellaufruf,
+   * Versand), und vom Rest darf nur ein Teil in den Klick fließen, sonst
+   * bleibt nichts übrig. Was übrig bleiben soll, steht in `targetMarginShare`.
+   */
+  economics?: {
+    /**
+     * Preis, auf dem die Rechnung beruht, in Cent. Muss nicht der Preis einer
+     * Stufe sein — bei zwei Stufen ist es der erwartete Mischpreis.
+     */
+    planPriceCents: number;
+    /** Angenommene Conversion Klick → Kauf als Band, z. B. [0.03, 0.05]. */
+    conversionBand: [number, number];
+    /** Wirtschaftlich vertretbarer Klickpreis in Cent, Band. */
+    targetCpcCents: [number, number];
+    /** Was der Markt für die passenden Suchbegriffe verlangt, in Cent. */
+    marketCpcCents: [number, number];
+    /**
+     * Woher der Marktwert stammt. Pflichtfeld: Eine geschätzte Zahl ohne
+     * Herkunft ist im Zweifel eine erfundene Zahl.
+     */
+    marketCpcSource: string;
+    /** Empfohlener Kanal, aus der Gegenüberstellung abgeleitet. */
+    channel: 'ads' | 'ads-longtail' | 'seo-first' | 'seo-only';
+    /** Ein Satz Einschätzung, in Klartext. */
+    verdict: string;
+  };
 }
 
 /** Ergebnis eines einzelnen Funds, nach Sanitizing. */

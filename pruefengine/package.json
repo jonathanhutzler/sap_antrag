@@ -16,6 +16,7 @@
     "test:ip": "tsx scripts/test-ip.ts",
     "mail:resend": "tsx scripts/resend-mails.ts",
     "measure:effort": "tsx scripts/measure-effort.ts",
+    "economics": "tsx scripts/economics.ts",
     "check": "npm run typecheck && npm run check:niches && npm run smoke:sanitize && npm run smoke:report && npm run test:vfe && npm run test:ip"
   },
   "dependencies": {
