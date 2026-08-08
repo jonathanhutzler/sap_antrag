@@ -142,13 +142,26 @@ export default function HubPage() {
       <section id="pruefungen" className="mt-24 scroll-mt-24">
         <p className="eyebrow">Prüfungen</p>
         <h2 className="mt-3 max-w-[24ch] text-display-lg">
-          {niches.length === 1 ? 'Zurzeit eine Prüfung' : `Zurzeit ${niches.length} Prüfungen`} — jede mit eigenem
-          Katalog
+          {niches.length === 0
+            ? 'Zurzeit ist keine Prüfung freigeschaltet'
+            : niches.length === 1
+              ? 'Zurzeit eine Prüfung — mit eigenem Katalog'
+              : `Zurzeit ${niches.length} Prüfungen — jede mit eigenem Katalog`}
         </h2>
         <p className="mt-4 max-w-prose text-ink-muted">
           Freigeschaltet wird eine Prüfung erst, wenn ihr Katalog fertig ist. Solange es keinen gibt, gibt es hier
           auch keine Seite dazu.
         </p>
+
+        {/*
+          Der leere Fall ist kein Fehler, sondern der Normalzustand vor der
+          ersten Freischaltung. Er darf nur nicht wie ein Ladefehler aussehen.
+        */}
+        {niches.length === 0 && (
+          <p className="mt-6 max-w-prose font-sans text-[0.97rem] leading-relaxed text-ink-faint">
+            Die erste Prüfung ist in Arbeit. Bis dahin gibt es hier nichts zu kaufen.
+          </p>
+        )}
 
         <div className="mt-10 space-y-5">
           {niches.map((niche) => (

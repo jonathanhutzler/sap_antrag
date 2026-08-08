@@ -29,7 +29,11 @@ import { catalogue } from '../catalogues/handwerkerrechnung.2026-08-01';
  */
 export const handwerkerrechnung: NicheConfig = {
   slug: 'handwerkerrechnung',
-  active: true,
+  // Nicht auf der Dachdomain. Das Produkt läuft eigenständig unter
+  // handwerkerrechnung-pruefen.de und bleibt dort. Die Nische steht hier als
+  // vollständige Referenzimplementierung: 33 Prüfpunkte, Landing, FAQ,
+  // Beispielansicht, 12 Artikel. Wer eine neue Nische baut, liest diese Datei.
+  active: false,
   aliasDomains: [],
 
   brand: {

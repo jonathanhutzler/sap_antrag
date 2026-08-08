@@ -8,35 +8,32 @@ Analytics-Konto, eine Support-Inbox.
 
 ---
 
-## Stand: bereit für den ersten Deploy
+## Stand: keine Nische freigeschaltet
 
-`npm run check:niches` meldet noch einen Fehler: die Dachdomain in
-`config/site.ts`. Sie ist das Einzige, was zwischen dem Repository und einem
-Deploy steht. Die Reihenfolge zum Abhaken steht in
-[`docs/livegang.md`](docs/livegang.md).
+Die Engine ist vollständig und lauffähig. Aktiv ist nichts, und das ist eine
+Entscheidung, kein Zwischenstand:
 
-**Live geht eine Nische: `handwerkerrechnung`.** Sie ist die einzige
-vollständige — 33 Prüfpunkte, Landing, FAQ, Beispielansicht, 12 Artikel. Die
-Nische ist aus den öffentlichen Seiten des Bestandsprodukts rekonstruiert, nicht
-aus dessen Quellcode portiert.
+**`handwerkerrechnung` gehört nicht auf die Dachdomain.** Das Produkt läuft
+eigenständig unter `handwerkerrechnung-pruefen.de` und bleibt dort. Die Nische
+steht hier als vollständige Referenzimplementierung — 33 Prüfpunkte, Landing,
+FAQ, Beispielansicht, 12 Artikel. Wer eine neue Nische baut, liest diese Datei
+und die zugehörige Katalogdatei.
 
-`handwerkerrechnung-pruefen.de` und `<dachdomain>/handwerkerrechnung` sind
-dasselbe Angebot auf denselben Suchbegriffen. Der saubere Weg ist eine 301 von
-der alten Domain auf die neue, mit Eintrag in `aliasDomains`. Beide parallel
-laufen zu lassen schwächt beide.
-
-**Die Vorfälligkeitsentschädigung steht auf `active: false`.** Der anwaltliche
+**Die Vorfälligkeitsentschädigung ist nicht freigegeben.** Der anwaltliche
 Review fehlt und die Zinsreihe ist nicht verifiziert. Eine Rechennische mit
 Platzhalter-Zinsen würde fünfstellige Beträge auf erfundenen Daten ausrechnen.
-Sobald beides erledigt ist, ist das eine Zeile.
 
-**Elf Nischen liegen in der Registry, eine ist aktiv.** Sieben sind vorbereitet:
-Config und Prüfkatalog stehen, Texte und Silo fehlen, der anwaltliche Review
-steht aus. Was jeder einzelnen bis zum Livegang fehlt und in welcher Reihenfolge
-das sinnvoll ist, steht in [`docs/nischen-pipeline.md`](docs/nischen-pipeline.md);
-die Zahlen dazu liefert `npm run economics`.
+**Sieben Nischen sind vorbereitet.** Config und Prüfkatalog stehen, Texte und
+Silo fehlen, der anwaltliche Review steht aus. Was jeder einzelnen fehlt und in
+welcher Reihenfolge das sinnvoll ist, steht in
+[`docs/nischen-pipeline.md`](docs/nischen-pipeline.md); die Zahlen dazu liefert
+`npm run economics`.
 
-Vor der ersten neuen Nische steht [Gate 0](docs/gate-0.md).
+Die Dachdomain geht damit mit ihrer ersten eigenen Nische live, nicht vorher.
+`npm run check:niches` bricht ab, solange keine Nische aktiv ist — ein Hub ohne
+Angebot und AGB ohne Leistungsbeschreibung sind kein Deploy. Die Reihenfolge
+für den Tag, an dem eine Nische fertig ist, steht in
+[`docs/livegang.md`](docs/livegang.md), davor [Gate 0](docs/gate-0.md).
 
 ---
 

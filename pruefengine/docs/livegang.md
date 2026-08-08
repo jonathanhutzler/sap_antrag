@@ -9,16 +9,22 @@ eine Vervielfachung einer offenen Frage.
 
 ## Was live geht
 
-Eine Nische: `handwerkerrechnung`. Sie ist die einzige vollständige — 33
-Prüfpunkte, Landing, FAQ, Beispielansicht, 12 Artikel.
+Die erste eigene Nische der Dachdomain. Aktuell ist keine fertig, deshalb
+bricht `npm run check:niches` mit „Keine einzige Nische ist aktiv" ab. Das ist
+kein Fehler im Code, sondern die Aussage, dass es nichts zu verkaufen gibt.
 
-Die Vorfälligkeitsentschädigung steht auf `active: false`. Der anwaltliche
-Review fehlt und die Zinsreihe ist nicht verifiziert; eine Rechennische mit
-Platzhalter-Zinsen würde fünfstellige Beträge auf erfundenen Daten ausrechnen.
-Sobald beides erledigt ist, ist das eine Zeile.
+`handwerkerrechnung` gehört nicht dazu. Das Produkt läuft eigenständig unter
+`handwerkerrechnung-pruefen.de` und bleibt dort. Die Nische steht im Repository
+als Referenzimplementierung und ist nicht erreichbar.
 
-Die sieben vorbereiteten Nischen bleiben inaktiv. Sie sind nicht erreichbar,
-stehen nicht im Hub und nicht in der Sitemap.
+Die Vorfälligkeitsentschädigung ist nicht freigegeben: anwaltlicher Review
+fehlt, Zinsreihe nicht verifiziert. Eine Rechennische mit Platzhalter-Zinsen
+würde fünfstellige Beträge auf erfundenen Daten ausrechnen.
+
+Bevor dieses Dokument abgearbeitet wird, muss also eine Nische fertig sein:
+Katalog anwaltlich bestätigt, Texte geschrieben, Silo mit acht bis zehn
+Artikeln, Stripe-Preise angelegt. Empfehlung und Reihenfolge stehen in
+[`nischen-pipeline.md`](nischen-pipeline.md).
 
 ## 1. Dachdomain
 
@@ -28,19 +34,16 @@ Der einzige verbleibende Fehler in `npm run check:niches`.
 - `NEXT_PUBLIC_SITE_DOMAIN` in Vercel setzen, ohne Protokoll und ohne www.
 - `check:niches` erneut laufen lassen. Danach nur noch Hinweise.
 
-## 2. Das Bestandsprodukt
+## 2. Das Bestandsprodukt bleibt, wo es ist
 
-`handwerkerrechnung-pruefen.de` und `<dachdomain>/handwerkerrechnung` sind
-dasselbe Angebot auf denselben Suchbegriffen. Zwei eigene Seiten auf einem
-Begriff schwächen beide.
+`handwerkerrechnung-pruefen.de` läuft weiter auf seiner eigenen Domain. Auf der
+Dachdomain gibt es keine Handwerkerrechnungs-Prüfung, also auch keine
+Keyword-Kollision und nichts umzuleiten.
 
-Ohne Umsatz auf der alten Seite gibt es nichts zu schützen. Der saubere Weg:
-301 von `handwerkerrechnung-pruefen.de` auf
-`<dachdomain>/handwerkerrechnung`, Domain zusätzlich in `aliasDomains`
-eintragen. Rankings und Backlinks der alten Seite gehen mit über.
-
-Die Alternative ist, die alte Seite abzuschalten und die Domain nur zu halten.
-Beides ist besser, als beide laufen zu lassen.
+Wenn das später anders entschieden wird, sind es zwei Schritte: `active: true`
+in `config/niches/handwerkerrechnung.ts` und eine 301 von der alten Domain auf
+`<dachdomain>/handwerkerrechnung`, mit Eintrag in `aliasDomains`. Beide Seiten
+parallel laufen zu lassen wäre die schlechteste Variante.
 
 ## 3. Umgebungsvariablen
 
@@ -53,8 +56,7 @@ Preview. Werte gehören nie in `.env.example`.
 | `ANTHROPIC_API_KEY` | Anthropic-Konsole |
 | `STRIPE_SECRET_KEY` | Stripe, **`sk_…`**, nicht `pk_…` |
 | `STRIPE_WEBHOOK_SECRET` | entsteht in Schritt 5 |
-| `STRIPE_PRICE_HANDWERKERRECHNUNG_BASIS` | Preis 24,90 € in Stripe anlegen |
-| `STRIPE_PRICE_HANDWERKERRECHNUNG_PLUS` | Preis 39,90 € in Stripe anlegen |
+| `STRIPE_PRICE_<NISCHE>_BASIS` / `_PLUS` | Preise der freigeschalteten Nische in Stripe anlegen |
 | `UPSTASH_REDIS_REST_URL` / `_TOKEN` | Upstash, Region Frankfurt |
 | `RESEND_API_KEY` | Resend |
 | `MAIL_FROM` | verifizierte Absenderdomain |
@@ -83,7 +85,7 @@ Next.js, Build- und Install-Kommando Standard.
 
 Mit Stripe im Testmodus, von Anfang bis Ende:
 
-1. Eine echte Handwerkerrechnung hochladen.
+1. Ein echtes Dokument der freigeschalteten Nische hochladen.
 2. Vorschau prüfen: Werden Funde angezeigt? Steht **keine** Euro-Summe darin?
 3. Kaufen mit Testkarte `4242 4242 4242 4242`.
 4. Zwei Mails prüfen: erst die Bestellbestätigung, dann der Bericht mit PDF.
@@ -101,6 +103,6 @@ Vier Ereignisse laufen ab dem ersten Besucher: `upload_started`,
 der Trichter abreißt — und das ist die Antwort auf die Frage, warum die alte
 Seite keinen Umsatz gemacht hat.
 
-Vorher kein Werbebudget. Die Wirtschaftlichkeitsrechnung sagt für die
-Handwerkerrechnung ohnehin, dass breite Ads bei 39,90 € nicht tragen; ein
-Longtail-Test gehört auf die Architektenrechnung, und die ist noch nicht fertig.
+Vorher kein Werbebudget. Welcher Klickpreis für die freigeschaltete Nische
+überhaupt vertretbar ist, sagt `npm run economics` — bei den meisten Nischen
+tragen breite Kampagnen nicht.

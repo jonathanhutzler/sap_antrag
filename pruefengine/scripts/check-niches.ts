@@ -370,6 +370,16 @@ for (const niche of registry) {
   else checkInactive(niche);
 }
 
+// Keine aktive Nische heißt: nichts zu verkaufen. Der Hub zeigt eine leere
+// Liste, die AGB beschreiben keine Leistung, die Sitemap führt nur Rechtsseiten.
+// Als Zwischenstand ist das in Ordnung, als Deploy nicht.
+if (registry.filter((n) => n.active).length === 0) {
+  fail(
+    'Registry',
+    'Keine einzige Nische ist aktiv. Der Hub hätte nichts anzubieten und die AGB keine Leistungsbeschreibung.',
+  );
+}
+
 console.log('\nPrüfe Anbieterdaten …\n');
 if (hasPlaceholders()) {
   fail('config/site.ts', 'Es stehen noch Platzhalter in den Anbieterdaten. Impressum und AGB sind unvollständig.');
