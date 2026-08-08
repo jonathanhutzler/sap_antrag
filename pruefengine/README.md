@@ -8,35 +8,35 @@ Analytics-Konto, eine Support-Inbox.
 
 ---
 
-## Stand: noch nicht produktiv
+## Stand: bereit für den ersten Deploy
 
-Die Engine ist vollständig und lauffähig, aber bewusst noch nicht live.
+`npm run check:niches` meldet noch einen Fehler: die Dachdomain in
+`config/site.ts`. Sie ist das Einzige, was zwischen dem Repository und einem
+Deploy steht. Die Reihenfolge zum Abhaken steht in
+[`docs/livegang.md`](docs/livegang.md).
 
-**`handwerkerrechnung` ist eine Referenzimplementierung, kein Livebetrieb.**
-Dasselbe Produkt läuft bereits eigenständig unter
-`handwerkerrechnung-pruefen.de` und bleibt dort. Die Nische steht in diesem
-Repository als vollständiges Beispiel dafür, wie eine Nische aussieht — an den
-Live-Werten ausgerichtet (Preise 24,90 / 39,90 €, Aufbewahrung 14 Tage,
-Anbieterdaten aus dem Impressum), aber aus den öffentlichen Seiten
-rekonstruiert und nicht aus dem Quellcode des Bestands portiert.
+**Live geht eine Nische: `handwerkerrechnung`.** Sie ist die einzige
+vollständige — 33 Prüfpunkte, Landing, FAQ, Beispielansicht, 12 Artikel. Die
+Nische ist aus den öffentlichen Seiten des Bestandsprodukts rekonstruiert, nicht
+aus dessen Quellcode portiert.
 
-**Vor dem ersten Deploy** muss deshalb eine Entscheidung fallen, sonst stehen
-zwei eigene Angebote auf denselben Suchbegriffen:
+`handwerkerrechnung-pruefen.de` und `<dachdomain>/handwerkerrechnung` sind
+dasselbe Angebot auf denselben Suchbegriffen. Der saubere Weg ist eine 301 von
+der alten Domain auf die neue, mit Eintrag in `aliasDomains`. Beide parallel
+laufen zu lassen schwächt beide.
 
-- `active: false` in `config/niches/handwerkerrechnung.ts` — die Engine geht
-  nur mit neuen Nischen live. **Das ist der aktuell vorgesehene Weg.**
-- oder der Bestand wird abgelöst: `handwerkerrechnung-pruefen.de` per 301 auf
-  `<dachdomain>/handwerkerrechnung`, Domain zusätzlich in `aliasDomains`.
+**Die Vorfälligkeitsentschädigung steht auf `active: false`.** Der anwaltliche
+Review fehlt und die Zinsreihe ist nicht verifiziert. Eine Rechennische mit
+Platzhalter-Zinsen würde fünfstellige Beträge auf erfundenen Daten ausrechnen.
+Sobald beides erledigt ist, ist das eine Zeile.
 
-Produktiv startet die Engine mit der ersten neuen Nische. Welche das wird,
-entscheidet [Gate 0](docs/gate-0.md).
+**Elf Nischen liegen in der Registry, eine ist aktiv.** Sieben sind vorbereitet:
+Config und Prüfkatalog stehen, Texte und Silo fehlen, der anwaltliche Review
+steht aus. Was jeder einzelnen bis zum Livegang fehlt und in welcher Reihenfolge
+das sinnvoll ist, steht in [`docs/nischen-pipeline.md`](docs/nischen-pipeline.md);
+die Zahlen dazu liefert `npm run economics`.
 
-**Elf Nischen liegen in der Registry, zwei sind aktiv.** Sieben weitere sind
-vorbereitet: Config und Prüfkatalog stehen, Texte und Silo fehlen, der
-anwaltliche Review steht aus. Was jeder einzelnen bis zum Livegang fehlt und in
-welcher Reihenfolge das sinnvoll ist, steht in
-[`docs/nischen-pipeline.md`](docs/nischen-pipeline.md); die Zahlen dazu liefert
-`npm run economics`.
+Vor der ersten neuen Nische steht [Gate 0](docs/gate-0.md).
 
 ---
 
