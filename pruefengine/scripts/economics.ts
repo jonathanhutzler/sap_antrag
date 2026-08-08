@@ -103,6 +103,61 @@ function zeile(niche: NicheConfig): string | null {
   ].join('');
 }
 
+/**
+ * Deckungsbeitrag je Verkauf und je Upload.
+ *
+ * Die zweite Zahl ist die, auf die es ankommt und die gern vergessen wird:
+ * Der Modellaufruf fällt bei **jedem** Upload an, auch bei den 95 Prozent, die
+ * nichts kaufen. Die kostenlose Vorschau ist die einzige Route, die Geld
+ * kostet, bevor jemand bezahlt hat.
+ */
+function deckungsbeitrag(niche: NicheConfig): {
+  jeVerkauf: number;
+  jeUploadNiedrig: number;
+  jeUploadHoch: number;
+} | null {
+  const e = niche.economics;
+  if (!e) return null;
+
+  const stripe = e.planPriceCents * STRIPE_ANTEIL + STRIPE_FIX_CENTS;
+  const jeVerkauf = e.planPriceCents - stripe - ZUSTELLUNG_CENTS;
+
+  const jeUpload = (conv: number) => jeVerkauf * conv - MODELL_CENTS_GESCHAETZT;
+
+  return {
+    jeVerkauf,
+    jeUploadNiedrig: jeUpload(e.conversionBand[0]),
+    jeUploadHoch: jeUpload(e.conversionBand[1]),
+  };
+}
+
+function deckungsbeitragTabelle(nischen: NicheConfig[]): void {
+  console.log('\nDeckungsbeitrag\n');
+  console.log(
+    `        ${'Nische'.padEnd(38)}${'je Verkauf'.padStart(12)}${'je Upload'.padStart(18)}${'Uploads für 1.000 €'.padStart(22)}`,
+  );
+  console.log('  ' + '─'.repeat(90));
+
+  for (const niche of nischen) {
+    const db = deckungsbeitrag(niche);
+    if (!db) continue;
+
+    const spanne = `${euro(Math.round(db.jeUploadNiedrig))}–${euro(Math.round(db.jeUploadHoch))} €`;
+    const mitte = (db.jeUploadNiedrig + db.jeUploadHoch) / 2;
+    const noetig = mitte > 0 ? `${Math.ceil(100000 / mitte).toLocaleString('de-DE')}` : 'nie';
+
+    console.log(
+      `  ${(niche.active ? 'aktiv ' : '      ') + niche.slug.padEnd(38)}${(euro(Math.round(db.jeVerkauf)) + ' €').padStart(12)}${spanne.padStart(18)}${noetig.padStart(22)}`,
+    );
+  }
+
+  console.log(
+    '\n  „je Upload" ist nach Abzug der Modellkosten aller Uploads, auch der nicht kaufenden.',
+  );
+  console.log('  „Uploads für 1.000 €" rechnet mit der Mitte des Conversion-Bandes, im Monat.');
+  console.log('  Feste Kosten für Hosting, Redis, Mailversand und Domain sind nicht abgezogen.\n');
+}
+
 function main(): void {
   const mitDaten = registry.filter((n) => n.economics);
   const ohneDaten = registry.filter((n) => !n.economics);
@@ -131,7 +186,9 @@ function main(): void {
     if (z) console.log('  ' + z);
   }
 
-  console.log('\nEinschätzung im Klartext\n');
+  deckungsbeitragTabelle(sortiert);
+
+  console.log('Einschätzung im Klartext\n');
   for (const niche of sortiert) {
     console.log(`  ${niche.slug}`);
     console.log(`    ${niche.economics!.verdict}`);
