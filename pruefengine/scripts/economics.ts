@@ -37,6 +37,22 @@ const MODELL_CENTS_GESCHAETZT = 60;
 const ZUSTELLUNG_CENTS = 5;
 
 /**
+ * Anteil der Besucher, die tatsächlich ein Dokument hochladen. ANNAHME.
+ *
+ * Diese Rate wird gern übersehen, und dann rechnet man falsch. `conversionBand`
+ * in der Config ist Klick → Kauf. Die Modellkosten fallen aber nicht je Klick
+ * an, sondern je Upload. Ohne diese zweite Rate lässt sich beides nicht
+ * auseinanderhalten:
+ *
+ *   Modellkosten je Klick   = Uploadrate × Modellkosten
+ *   Upload → Kauf           = Klick-zu-Kauf ÷ Uploadrate
+ *
+ * Der Wert ist geschätzt. Er steht in Vercel Analytics als
+ * upload_started ÷ Seitenaufrufe, sobald Traffic da ist.
+ */
+const UPLOAD_RATE_BAND: [number, number] = [0.25, 0.4];
+
+/**
  * Anteil des Deckungsbeitrags, der in den Klick fließen darf.
  *
  * 0,4 heißt: 60 Prozent des Deckungsbeitrags bleiben nach dem Klick übrig.
@@ -113,8 +129,12 @@ function zeile(niche: NicheConfig): string | null {
  */
 function deckungsbeitrag(niche: NicheConfig): {
   jeVerkauf: number;
-  jeUploadNiedrig: number;
-  jeUploadHoch: number;
+  /** Nach Abzug der Modellkosten des einen Uploads, der zu diesem Kauf führt. */
+  jeUpload: [number, number];
+  /** Nach Abzug der anteiligen Modellkosten je Klick. Ohne Werbekosten. */
+  jeKlick: [number, number];
+  /** Upload → Kauf, abgeleitet aus Klick-zu-Kauf und Uploadrate. */
+  uploadZuKauf: [number, number];
 } | null {
   const e = niche.economics;
   if (!e) return null;
@@ -122,40 +142,90 @@ function deckungsbeitrag(niche: NicheConfig): {
   const stripe = e.planPriceCents * STRIPE_ANTEIL + STRIPE_FIX_CENTS;
   const jeVerkauf = e.planPriceCents - stripe - ZUSTELLUNG_CENTS;
 
-  const jeUpload = (conv: number) => jeVerkauf * conv - MODELL_CENTS_GESCHAETZT;
+  // Vorsichtiger Rand zuerst: wenige Käufer, viele Uploads.
+  const u2kNiedrig = e.conversionBand[0] / UPLOAD_RATE_BAND[1];
+  const u2kHoch = e.conversionBand[1] / UPLOAD_RATE_BAND[0];
 
   return {
     jeVerkauf,
-    jeUploadNiedrig: jeUpload(e.conversionBand[0]),
-    jeUploadHoch: jeUpload(e.conversionBand[1]),
+    jeUpload: [
+      jeVerkauf * u2kNiedrig - MODELL_CENTS_GESCHAETZT,
+      jeVerkauf * u2kHoch - MODELL_CENTS_GESCHAETZT,
+    ],
+    jeKlick: [
+      jeVerkauf * e.conversionBand[0] - MODELL_CENTS_GESCHAETZT * UPLOAD_RATE_BAND[1],
+      jeVerkauf * e.conversionBand[1] - MODELL_CENTS_GESCHAETZT * UPLOAD_RATE_BAND[0],
+    ],
+    uploadZuKauf: [u2kNiedrig, u2kHoch],
   };
 }
 
 function deckungsbeitragTabelle(nischen: NicheConfig[]): void {
-  console.log('\nDeckungsbeitrag\n');
+  console.log('\nDeckungsbeitrag ohne Werbekosten\n');
   console.log(
-    `        ${'Nische'.padEnd(38)}${'je Verkauf'.padStart(12)}${'je Upload'.padStart(18)}${'Uploads für 1.000 €'.padStart(22)}`,
+    `        ${'Nische'.padEnd(38)}${'je Verkauf'.padStart(12)}${'Upload→Kauf'.padStart(14)}${'je Upload'.padStart(18)}${'je Klick'.padStart(16)}`,
   );
-  console.log('  ' + '─'.repeat(90));
+  console.log('  ' + '─'.repeat(100));
 
   for (const niche of nischen) {
     const db = deckungsbeitrag(niche);
     if (!db) continue;
 
-    const spanne = `${euro(Math.round(db.jeUploadNiedrig))}–${euro(Math.round(db.jeUploadHoch))} €`;
-    const mitte = (db.jeUploadNiedrig + db.jeUploadHoch) / 2;
-    const noetig = mitte > 0 ? `${Math.ceil(100000 / mitte).toLocaleString('de-DE')}` : 'nie';
+    const u2k = `${(db.uploadZuKauf[0] * 100).toFixed(0)}–${(db.uploadZuKauf[1] * 100).toFixed(0)} %`;
+    const upl = `${euro(Math.round(db.jeUpload[0]))}–${euro(Math.round(db.jeUpload[1]))} €`;
+    const klk = `${euro(Math.round(db.jeKlick[0]))}–${euro(Math.round(db.jeKlick[1]))} €`;
 
     console.log(
-      `  ${(niche.active ? 'aktiv ' : '      ') + niche.slug.padEnd(38)}${(euro(Math.round(db.jeVerkauf)) + ' €').padStart(12)}${spanne.padStart(18)}${noetig.padStart(22)}`,
+      `  ${(niche.active ? 'aktiv ' : '      ') + niche.slug.padEnd(38)}${(euro(Math.round(db.jeVerkauf)) + ' €').padStart(12)}${u2k.padStart(14)}${upl.padStart(18)}${klk.padStart(16)}`,
     );
   }
 
   console.log(
-    '\n  „je Upload" ist nach Abzug der Modellkosten aller Uploads, auch der nicht kaufenden.',
+    `\n  Uploadrate angenommen mit ${UPLOAD_RATE_BAND[0] * 100}–${UPLOAD_RATE_BAND[1] * 100} %. Daraus folgt Upload→Kauf und die Verteilung der Modellkosten.`,
   );
-  console.log('  „Uploads für 1.000 €" rechnet mit der Mitte des Conversion-Bandes, im Monat.');
   console.log('  Feste Kosten für Hosting, Redis, Mailversand und Domain sind nicht abgezogen.\n');
+}
+
+/**
+ * Was ein Werbebudget bringt.
+ *
+ * Die Rechnung, die vor jeder Kampagne fehlt: Deckungsbeitrag je Klick minus
+ * Klickpreis. Ist die Zahl negativ, kostet jeder gekaufte Klick Geld, und mehr
+ * Budget kostet mehr Geld. Gerechnet wird gegen beide Ränder des Marktpreises.
+ */
+function adsTabelle(nischen: NicheConfig[]): void {
+  const BUDGET_CENTS = 100000;
+
+  console.log('Mit Ads: 1.000 € Budget\n');
+  console.log(
+    `        ${'Nische'.padEnd(38)}${'DB je Klick'.padStart(15)}${'bei günstigem CPC'.padStart(24)}${'bei teurem CPC'.padStart(22)}`,
+  );
+  console.log('  ' + '─'.repeat(100));
+
+  for (const niche of nischen) {
+    const db = deckungsbeitrag(niche);
+    const e = niche.economics;
+    if (!db || !e) continue;
+
+    const ergebnis = (cpc: number): string => {
+      const klicks = BUDGET_CENTS / cpc;
+      const low = Math.round((klicks * (db.jeKlick[0] - cpc)) / 100);
+      const high = Math.round((klicks * (db.jeKlick[1] - cpc)) / 100);
+      const fmt = (v: number) => `${v > 0 ? '+' : ''}${v.toLocaleString('de-DE')}`;
+      return `${fmt(low)} … ${fmt(high)} €`;
+    };
+
+    console.log(
+      `  ${(niche.active ? 'aktiv ' : '      ') + niche.slug.padEnd(38)}${`${euro(Math.round(db.jeKlick[0]))}–${euro(Math.round(db.jeKlick[1]))} €`.padStart(15)}${`${euro(e.marketCpcCents[0])} €: ${ergebnis(e.marketCpcCents[0])}`.padStart(24)}${`${euro(e.marketCpcCents[1])} €: ${ergebnis(e.marketCpcCents[1])}`.padStart(22)}`,
+    );
+  }
+
+  console.log(
+    '\n  Ergebnis nach Werbekosten, ohne feste Kosten. Der linke Wert jeder Spanne ist der vorsichtige Rand.',
+  );
+  console.log(
+    '  Negativ heißt: Jeder gekaufte Klick kostet Geld, und ein größeres Budget kostet mehr Geld.\n',
+  );
 }
 
 function main(): void {
@@ -187,6 +257,7 @@ function main(): void {
   }
 
   deckungsbeitragTabelle(sortiert);
+  adsTabelle(sortiert);
 
   console.log('Einschätzung im Klartext\n');
   for (const niche of sortiert) {
